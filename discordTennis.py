@@ -54,6 +54,6 @@ async def recurring_task():
         await DTF.maj(bot)
         await asyncio.sleep(60)
 
-bot.loop.create_task(recurring_task())
-
-bot.run(DB.getDiscordToken())
+def main():
+    bot.loop.create_task(recurring_task())
+    bot.run(DB.getDiscordToken())
