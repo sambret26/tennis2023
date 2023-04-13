@@ -8,7 +8,7 @@ import os
 import discordTennis
 
 # KEEPING ALIVE (en cas de deploiement sur replit)
-if "REPLIT" in os.environ:
+if "Replit" in os.environ:
   import keep_alive
   keep_alive.keep_alive()
 
