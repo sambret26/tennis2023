@@ -1,3 +1,7 @@
 __pycache__
 old/
 DB.db
+venv/
+pyproject.toml
+replit.nix
+poetry.lock
