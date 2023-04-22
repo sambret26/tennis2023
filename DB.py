@@ -123,11 +123,11 @@ def getMessages(cat):
   return messages
 
 
-def getChannelID(cat):
+def getLogChannelID(cat):
   connection = connect()
   cursor = connection.cursor()
-  query = "SELECT ChannelID FROM Channels WHERE Category = ?"
-  values = (cat, )
+  query = "SELECT ChannelID FROM Channels WHERE Category = ? and Type = ?"
+  values = (cat, "Logs")
   channelID = cursor.execute(query, values).fetchone()[0]
   connection.close()
   return channelID

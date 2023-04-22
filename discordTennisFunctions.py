@@ -97,7 +97,7 @@ async def sendMessages(bot, void):
 
 async def sendMessagesByCategory(bot, cat, void):
   messages = DB.getMessages(cat)
-  channelID = DB.getChannelID(cat)
+  channelID = DB.getLogChannelID(cat)
   channel = await bot.fetch_channel(channelID)
   for message in messages:
     await channel.send(message[1])
