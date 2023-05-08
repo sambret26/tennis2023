@@ -22,7 +22,7 @@ def getInformations(retry=5):
     else:
       return getInformations(retry - 1)
   res = br.open(DB.getDataURL())
-  content = res.read().decode("cp850")
+  content = res.read().decode("utf8")
   players = parse(content)
   return players
 
