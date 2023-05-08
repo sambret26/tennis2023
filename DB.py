@@ -21,6 +21,13 @@ def getNumberPlayers():
   connection.close()
   return number
 
+def getCategoriesById(id):
+  connection = connect()
+  cursor = connection.cursor()
+  query = f"SELECT SM, SD, DM, DD, DX FROM Players WHERE id = {id}"
+  categories = cursor.execute(query).fetchone()
+  connection.close()
+  return categories
 
 def getNumberPlayersByCategory(category):
   connection = connect()
@@ -163,7 +170,7 @@ def searchPlayer(player):
 def setAllPlayersToZero():
   connection = connect()
   cursor = connection.cursor()
-  query = "UPDATE Players SET state = 0, SM = 0, SD = 0, DM = 0, DD = 0, DX = 0, C = 0"
+  query = "UPDATE Players SET state = 0"
   cursor.execute(query)
   connection.commit()
   connection.close()
