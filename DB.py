@@ -21,6 +21,7 @@ def getNumberPlayers():
   connection.close()
   return number
 
+
 def getCategoriesById(id):
   connection = connect()
   cursor = connection.cursor()
@@ -28,6 +29,7 @@ def getCategoriesById(id):
   categories = cursor.execute(query).fetchone()
   connection.close()
   return categories
+
 
 def getNumberPlayersByCategory(category):
   connection = connect()

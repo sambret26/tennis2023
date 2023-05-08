@@ -80,16 +80,20 @@ def updateDB(players):
     DB.deletePlayer(playerToRemove[0])
     sendNotifRemove(playerToRemove)
 
+
 def checkCatergories(player, id):
-    categoriesInDB = DB.getCategoriesById(id)
-    for (index, category) in [(0, "SM"), (1, "SD"), (2, "DM"),
-                              (3, "DD"), (4, "DX")]:
-      if(categoriesInDB[index] == 0 and player[category] == 1):
-        DB.addMessage(category, player)
-      elif(categoriesInDB[index] == 1 and player[category] == 0):
-        newPlayer = [0, player["Firstname"], player["Lastname"],
-                  player["Ranking"], player["Club"]]
-        DB.removeMessage(category, newPlayer)
+  categoriesInDB = DB.getCategoriesById(id)
+  for (index, category) in [(0, "SM"), (1, "SD"), (2, "DM"), (3, "DD"),
+                            (4, "DX")]:
+    if (categoriesInDB[index] == 0 and player[category] == 1):
+      DB.addMessage(category, player)
+    elif (categoriesInDB[index] == 1 and player[category] == 0):
+      newPlayer = [
+        0, player["Firstname"], player["Lastname"], player["Ranking"],
+        player["Club"]
+      ]
+      DB.removeMessage(category, newPlayer)
+
 
 def sendNotifAdd(player):
   DB.addMessage("G", player)
