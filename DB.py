@@ -227,6 +227,19 @@ def setScore(id, score):
   connection.commit()
   connection.close()
 
+
+def updatePlayerId(name, playerId):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Player1 = ? WHERE Player1 = ?"
+  values = (playerId, name)
+  cursor.execute(query, values)
+  query = "UPDATE Matchs SET Player2 = ? WHERE Player2 = ?"
+  values = (playerId, name)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
   ### INSERT
 
 
