@@ -227,7 +227,6 @@ def setScore(id, score):
   connection.commit()
   connection.close()
 
-
   ### INSERT
 
 

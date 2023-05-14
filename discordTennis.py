@@ -60,7 +60,7 @@ async def result(ctx, name=None):
 @bot.command()
 async def resultat(ctx, name=None):
   if ctx.message.guild.id != DB.getGuildID(): return
-  await DTF.result(bot, ctx, name)    
+  await DTF.result(bot, ctx, name)
 
 
 @bot.command()
