@@ -32,6 +32,18 @@ async def nb(bot, ctx):
       await sendCategoryDetails(ctx, category)
 
 
+async def info(ctx, name):
+  msg = ctx.message.content
+  if name == None :
+    await ctx.send("La commande $info doit être suivi du nom d'un match (ex : $info SM27)")
+    return
+  matchInfos = DB.getMatchInfosByName(name)
+  if matchInfos == None:
+    await ctx.send(f"Le match {name} n'a pas été trouvé en base de données")
+    return
+  message = generateMatchMessage(matchInfos)
+  await ctx.send(message)
+
 async def askDetails(bot, ctx):
 
   def check(m):
@@ -104,3 +116,49 @@ async def sendMessagesByCategory(bot, cat, void):
     DB.deleteMessage(message[0])
   if cat == "G" and len(messages) == 0 and void:
     await channel.send("Aucune nouvelle inscription")
+
+def generateMatchMessage(matchInfos):
+  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score = matchInfos
+  if player1Id == None:
+    player1 = None
+  elif player1Id.startswith("V"):
+    match = player1Id.lstrip("V")
+    player1 = f"Le vainqueur du match {match}"
+  else :
+    p1 = DB.getPlayerInfosById(player1Id)
+    player1 = "{} {} ({})".format(p1[1], p1[0], p1[2])
+  if player2Id == None:
+    player2 = None
+  elif player2Id.startswith("V"):
+    match = player2Id.lstrip("V")
+    player2 = f"Le vainqueur du match {match}"
+  else :
+    p2 = DB.getPlayerInfosById(player2Id)
+    player2 = "{} {} ({})".format(p2[1], p2[0], p2[2])
+  if finish :
+    msg = "Le match {} à opposé {} à {}".format(name, player1, player2)
+    if day != None : msg += " le {}".format(day)
+    if hour != None : msg += " à {}".format(hour)
+    if court != None : msg += " sur le court {}".format(court)
+    msg += "."
+    if winnerId != None :
+      winner = player2
+      if winnerId == player1Id : winner = player1
+      msg += " Il à été gagné par {}".format(winner.split("(")[0])
+      if score != None :
+        msg +=" ({})".format(score)
+      msg += "."
+  else:
+    if player1 != None and player2 != None :
+      msg = "Le match {} opposera {} à {}".format(name, player1, player2)
+    elif player1 != None :
+      msg = "Le match {} opposera {} à ?".format(name, player1)
+    elif player2 != None :
+      msg = "Le match {} opposera {} à ?".format(name, player2)
+    else:
+      msg = "Le match {} se jouera".format(name)
+    if day != None : msg += " le {}".format(day)
+    if hour != None : msg += " à {}".format(hour)
+    if court != None : msg += " sur le court {}".format(court)
+    msg += "."
+  return msg

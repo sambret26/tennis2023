@@ -46,6 +46,12 @@ async def nb(ctx):
 
 
 @bot.command()
+async def info(ctx, name=None):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.info(ctx, name)
+
+
+@bot.command()
 @commands.check(isAllowed)
 async def clear(ctx, nombre: int = 100):
   await ctx.channel.purge(limit=nombre + 1, check=lambda msg: not msg.pinned)

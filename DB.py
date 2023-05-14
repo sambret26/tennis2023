@@ -156,6 +156,25 @@ def getChannelCategorie(channelId):
   return cat
 
 
+def getMatchInfosByName(name):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "SELECT * FROM Matchs WHERE Name = ?"
+  values = (name, )
+  result = cursor.execute(query, values).fetchone()
+  connection.close()
+  return result
+
+
+def getPlayerInfosById(id):
+  connection = connect()
+  cursor = connection.cursor()
+  query = f"SELECT Firstname, Lastname, Ranking FROM Players WHERE id = {id}"
+  result = cursor.execute(query).fetchone()
+  connection.close()
+  return result
+
+
 def searchPlayer(player):
   connection = connect()
   cursor = connection.cursor()
