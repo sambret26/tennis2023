@@ -52,6 +52,18 @@ async def info(ctx, name=None):
 
 
 @bot.command()
+async def result(ctx, name=None):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.result(bot, ctx, name)
+
+
+@bot.command()
+async def resultat(ctx, name=None):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.result(bot, ctx, name)    
+
+
+@bot.command()
 @commands.check(isAllowed)
 async def clear(ctx, nombre: int = 100):
   await ctx.channel.purge(limit=nombre + 1, check=lambda msg: not msg.pinned)

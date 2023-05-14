@@ -24,7 +24,7 @@ async def nb(bot, ctx):
     await ctx.send(message)
   else:
     await ctx.send(numberPlayersByCategory(category))
-  details = await askDetails(bot, ctx)
+  details = await yesOrNot(bot, ctx, "Afficher les détails des classements ?")
   if (details):
     if (category is None or category == "G"):
       await sendAllDetails(ctx)
@@ -44,23 +44,70 @@ async def info(ctx, name):
   message = generateMatchMessage(matchInfos)
   await ctx.send(message)
 
-async def askDetails(bot, ctx):
+
+async def result(bot, ctx, name):
+  msg = ctx.message.content
+  if name == None :
+    await ctx.send("La commande $info doit être suivi du nom d'un match (ex : $info SM27)")
+    return
+  matchInfos = DB.getMatchInfosByName(name)
+  if matchInfos == None:
+    await ctx.send(f"Le match {name} n'a pas été trouvé en base de données")
+    return
+  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score = matchInfos
+  if winnerId != None and score != None:
+    res = await yesOrNot(bot, ctx, "Le vainqueur et le score de ce match sont déjà renseignés\nVoulez-vous renseigner de nouveaux résultats ?")
+    if res : await setResult(bot, ctx, id, name, player1Id, player2Id, True)
+  elif winnerId != None:
+    res = await yesOrNot(bot, ctx, "Le vainqueur de ce match est déjà renseigné\nVoulez-vous renseigner un nouveau vainqueur ?")
+    if not res : await setResult(bot, ctx, id, name, player1Id, player2Id, False)
+    else : await setResult(bot, ctx, id, name, player1Id, player2Id, True)
+  else :
+    await setResult(bot, ctx, id, name, player1Id, player2Id, True)
+
+
+async def yesOrNot(bot, ctx, message):
+  return await question(bot, ctx, message, [("Oui", "1", "Green"), ("Non", "0", "Red")])
+
+
+async def question(bot, ctx, message, list):
+  while len(list) > 0:
+    questionList = list[:4]
+    if len(questionList) == 4 : questionList.append(("Afficher plus", "Next", "Blue"))
+    result = await question5max(bot, ctx, message, questionList)
+    if result != "Next": return result
+    list = list[4:]
+
+
+async def question5max(bot, ctx, message, list):
 
   def check(m):
     return m.author.id == ctx.author.id and m.origin_message.id == choice.id
 
-  buttons = [
-    create_button(style=ButtonStyle.green, label="Oui", custom_id="1"),
-    create_button(style=ButtonStyle.red, label="Non", custom_id="0")
-  ]
+  buttons = generateButtons(list)
   actionRow = create_actionrow(*buttons)
-  choice = await ctx.send("Afficher les détails des classements ?",
-                          components=[actionRow])
+  choice = await ctx.send(message, components=[actionRow])
   buttonCtx = await wait_for_component(bot, components=actionRow, check=check)
-  await buttonCtx.edit_origin(
-    content="Afficher les détails des classements ? (" + buttonCtx.custom_id +
-    ")")
-  return int(buttonCtx.custom_id)
+  await buttonCtx.edit_origin(content= message + "(" + buttonCtx.custom_id +")")
+  if buttonCtx.custom_id.isdigit() : return int(buttonCtx.custom_id)
+  return buttonCtx.custom_id
+
+
+def generateButtons(list):
+  buttons = []
+  for (index, value) in enumerate (list) :
+    buttons.append(create_button(
+    style = findStyle(index, value[2] if len(value) > 2 else None), label = value[0], custom_id = value[1]))
+  return buttons
+
+
+def findStyle(index, value):
+  if value.lower() == "green" : return ButtonStyle.green
+  if value.lower() == "red" : return ButtonStyle.red
+  if value.lower() == "blue" : return ButtonStyle.blue
+  if index%3 == 0 : return ButtonStyle.green
+  if index%3 == 1 : return ButtonStyle.red
+  return ButtonStyle.blue
 
 
 async def sendAllDetails(ctx):
@@ -162,3 +209,45 @@ def generateMatchMessage(matchInfos):
     if court != None : msg += " sur le court {}".format(court)
     msg += "."
   return msg
+
+async def setResult(bot, ctx, id, name, player1Id, player2Id, winner):
+  if winner :
+    if player1Id == None or player1Id.startswith("V"):
+      player1 = "Joueur inconnu"
+    else :
+      p1 = DB.getPlayerInfosById(player1Id)
+      player1 = "{} {}".format(p1[1], p1[0])
+    if player2Id == None or player2Id.startswith("V"):
+      player2 = "Joueur inconnu"
+    else :
+      p2 = DB.getPlayerInfosById(player2Id)
+      player2 = "{} {}".format(p2[1], p2[0])
+    message = "Quel joueur a gagné le match ?"
+    winner = await question(bot, ctx, message, [(player1, player1Id, "green"), (player2, player2Id, "blue")])
+    DB.setWinner(id, winner)
+  set1 = await askSetResult(bot, ctx, "Quel est le résultat du premier set ?")
+  set2 = await askSetResult(bot, ctx, "Quel est le résultat du deuxième set ?")
+  res = set1 + " " + set2
+  if thirdSet(set1, set2)  :
+    set3 = await askSetResult(bot, ctx, "Quel est le résultat du troisième set ?", False)
+    res += " " + set3
+  DB.setScore(id, res)
+  await ctx.send(f"Le résultat du match {name} a été mis à jour")
+
+async def askSetResult(bot, ctx, message, canLose = True):
+  list = []
+  win = ["7/5", "6/4", "6/3", "6/2", "6/1", "6/0"]
+  for score in win :
+    list.append((score, score, "green"))
+  if canLose :
+    lose = ["5/7", "4/6", "3/6", "2/6", "1/6", "0/6"]
+    for score in lose :
+      list.append((score, score, "red"))
+  return await question(bot, ctx, message, list)
+
+def thirdSet(set1, set2):
+  win = 0
+  for set in [set1, set2]:
+    score1, score2 = set.split("/")
+    if score1 > score2 : win = win + 1
+  return win < 2

@@ -207,6 +207,27 @@ def setPlayerToOne(player, id):
   connection.commit()
   connection.close()
 
+
+def setWinner(id, playerId):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Winner = ?, Finish = 1 WHERE id = ?"
+  values = (playerId, id)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
+def setScore(id, score):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Score = ?, Finish = 1 WHERE id = ?"
+  values = (score, id)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
   ### INSERT
 
 
