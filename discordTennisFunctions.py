@@ -244,7 +244,7 @@ async def setResult(bot, ctx, id, name, player1Id, player2Id, winner):
     winner = await question(bot, ctx, message, [(player1, player1Id, "green"),
                                                 (player2, player2Id, "blue")])
     DB.setWinner(id, winner)
-    DB.updatePlayerId("V"+name, winner)
+    DB.updatePlayerId("V" + name, winner)
   set1 = await askSetResult(bot, ctx, "Quel est le résultat du premier set ?")
   set2 = await askSetResult(bot, ctx, "Quel est le résultat du deuxième set ?")
   res = set1 + " " + set2
