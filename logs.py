@@ -5,7 +5,6 @@ from datetime import datetime as date
 from datetime import timedelta
 import os
 
-
 # CONST
 
 MAJ = "[MAJ]"
@@ -33,6 +32,7 @@ def printDetails(type1, type2, message):
                                               message)
   with open("./logs/out.txt", 'a') as f:
     f.write(formattedMessage)
+
 
 # Returns the current date, with an offset if necessary (c.f. jetlag)
 def getCurrentDate():

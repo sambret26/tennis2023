@@ -201,10 +201,11 @@ def setAllPlayersToZero():
 
 
 def setPlayerToOne(player, id):
-  printDetails(logs.DB, logs.INFO,
+  printDetails(
+    logs.DB, logs.INFO,
     "Setting SM = {}, SD = {}, DM = {}, DD = {}, DX = {} for {} {} ".format(
-    player["SM"], player["SD"], player["DM"], player["DD"],
-    player["DX"], player["Firstname"], player["Lastname"]))
+      player["SM"], player["SD"], player["DM"], player["DD"], player["DX"],
+      player["Firstname"], player["Lastname"]))
   connection = connect()
   cursor = connection.cursor()
   query = "UPDATE Players SET state = 1, SM = ?, SD = ?, DM = ?, DD = ?, DX = ?, C = ? WHERE id = ?"
@@ -216,8 +217,8 @@ def setPlayerToOne(player, id):
 
 
 def setWinner(id, playerId):
-  printLogs(logs.DB, logs.INFO, "Setting winner = {} for match {}".format(
-    winner, id))
+  printLogs(logs.DB, logs.INFO,
+            "Setting winner = {} for match {}".format(winner, id))
   connection = connect()
   cursor = connection.cursor()
   query = "UPDATE Matchs SET Winner = ?, Finish = 1 WHERE id = ?"
@@ -228,8 +229,8 @@ def setWinner(id, playerId):
 
 
 def setScore(id, score):
-  printLogs(logs.DB, logs.INFO, "Setting score = {} for match = {}".format(
-    score, id))
+  printLogs(logs.DB, logs.INFO,
+            "Setting score = {} for match = {}".format(score, id))
   connection = connect()
   cursor = connection.cursor()
   query = "UPDATE Matchs SET Score = ?, Finish = 1 WHERE id = ?"
@@ -240,8 +241,8 @@ def setScore(id, score):
 
 
 def updatePlayerId(name, playerId):
-  printLogs(logs.DB, logs.INFO, "Setting player = {} where it was {}".format(
-    playerId, name))
+  printLogs(logs.DB, logs.INFO,
+            "Setting player = {} where it was {}".format(playerId, name))
   connection = connect()
   cursor = connection.cursor()
   query = "UPDATE Matchs SET Player1 = ? WHERE Player1 = ?"
@@ -257,11 +258,12 @@ def updatePlayerId(name, playerId):
 
 
 def insertPlayer(player):
-  printLogs(logs.DB, logs.INFO,
+  printLogs(
+    logs.DB, logs.INFO,
     "Adding {} {} {} {} {} SM = {} SD = {} DM = {} DD = {} DX = {}".format(
-    player["Firstname"], player["Lastname"], player["Ranking"],
-    player["Club"], player["Email"], player["SM"], player["SD"],
-    player["DM"], player["DD"], player["DX"]))
+      player["Firstname"], player["Lastname"], player["Ranking"],
+      player["Club"], player["Email"], player["SM"], player["SD"],
+      player["DM"], player["DD"], player["DX"]))
   connection = connect()
   cursor = connection.cursor()
   query = "INSERT INTO Players (firstname, lastname, ranking, club, mail, SM, SD, DM, DD, DX, C) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
@@ -276,8 +278,8 @@ def insertPlayer(player):
 def addMessage(category, player):
   message = "Nouvelle inscription : {} {} ({}) classé(e) {}".format(
     player["Firstname"], player["Lastname"], player["Club"], player["Ranking"])
-  printLogs(logs.DB, logs.INFO, "Adding message {} in {}".format(
-    message, category))
+  printLogs(logs.DB, logs.INFO,
+            "Adding message {} in {}".format(message, category))
   connection = connect()
   cursor = connection.cursor()
   query = "INSERT INTO Messages (category, message) VALUES (?, ?)"
@@ -290,8 +292,8 @@ def addMessage(category, player):
 def removeMessage(category, player):
   message = "Désinscription de {} {} ({}) classé(e) {}".format(
     player[1], player[2], player[4], player[3])
-  printLogs(logs.DB, logs.INFO, "Adding message {} in {}".format(
-    message, category))
+  printLogs(logs.DB, logs.INFO,
+            "Adding message {} in {}".format(message, category))
   connection = connect()
   cursor = connection.cursor()
   query = "INSERT INTO Messages (category, message) VALUES (?, ?)"
@@ -305,8 +307,8 @@ def removeMessage(category, player):
 
 def deletePlayer(id):
   datas = getPlayerInfosById(id)
-  printLogs(logs.DB, logs.INFO, "Deleting player {} {}".format(
-    datas[0], datas[1]))
+  printLogs(logs.DB, logs.INFO,
+            "Deleting player {} {}".format(datas[0], datas[1]))
   connection = connect()
   cursor = connection.cursor()
   query = "DELETE FROM Players WHERE id = ?"
