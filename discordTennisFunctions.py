@@ -3,12 +3,15 @@
 # IMPORTS
 from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
 from discord_slash import ButtonStyle
+from logs import printLogs
 import discord
 import tennis
+import logs
 import DB
 
 
 async def maj(bot, void=False):
+  printLogs(logs.MAJ, logs.INFO, "Updating")
   tennis.main()
   await sendMessages(bot, void)
 
