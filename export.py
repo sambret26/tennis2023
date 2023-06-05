@@ -1,62 +1,56 @@
 # -*- coding: utf-8 -*-
 
-
 # IMPORTS
 from flask import Flask, jsonify
 import sqlite3
 
-
 # CONST
-DBNAME = "BD.db"
+DBNAME = "DB.db"
 
-
-app = Flask(__name__)
+app = Flask('app')
 
 
 # Returns a connection object to the database
 def connect():
-  return sqlite.connect(DBNAME)
+  return sqlite3.connect(DBNAME)
 
+  ### EXPORT
 
-    ### EXPORT
 
 @app.route('/channels', methods=['GET'])
-def exportChanels():
+def exportChannels():
   connection = connect()
   cursor = connection.cursor()
   channels = cursor.execute("SELECT * FROM Channels").fetchall()
   connection.close()
-  return channels
+  return jsonify(channels)
 
 
 @app.route('/matchs', methods=['GET'])
 def exportMatchs():
   connection = connect()
   cursor = connection.cursor()
-  channels = cursor.execute("SELECT * FROM Matchs").fetchall()
+  matchs = cursor.execute("SELECT * FROM Matchs").fetchall()
   connection.close()
-  return channels
+  return jsonify(matchs)
+
 
 @app.route('/players', methods=['GET'])
 def exportPlayers():
-    connection = connect()
-    cursor = connection.cursor()
-    channels = cursor.execute("SELECT * FROM Players").fetchall()
-    connection.close()
-    return channels
+  connection = connect()
+  cursor = connection.cursor()
+  players = cursor.execute("SELECT * FROM Players").fetchall()
+  connection.close()
+  return jsonify(players)
 
 
 @app.route('/privateDatas', methods=['GET'])
 def exportPrivateDatas():
   connection = connect()
   cursor = connection.cursor()
-  channels = cursor.execute("SELECT * FROM PrivateDatas").fetchall()
+  privateDatas = cursor.execute("SELECT * FROM PrivateDatas").fetchall()
   connection.close()
-  return channels
+  return jsonify(privateDatas)
 
 
-def main():
-  app.run()
-
-
-main()
+app.run(host="0.0.0.0", port=8080)

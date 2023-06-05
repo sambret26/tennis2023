@@ -4,6 +4,7 @@
 from logs import printLogs, printDetails
 import sqlite3
 import logs
+import jsonify
 
 # CONST
 DBNAME = "DB.db"
