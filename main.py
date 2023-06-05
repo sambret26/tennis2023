@@ -3,7 +3,7 @@ import os
 
 # IMPORTS
 import sys
-
+import export
 sys.path.append("modules")
 
 import discordTennis
@@ -15,3 +15,4 @@ if "Replit" in os.environ:
 
 # START
 discordTennis.main()
+export.main()
