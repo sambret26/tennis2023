@@ -51,7 +51,7 @@ def parse(content):
         categories.append(category)
     players.append({
       'Firstname': firstname.title(),
-      'Lastname': lastname.title(),
+      'Lastname': lastname.upper(),
       'Club': club,
       'Ranking': ranking,
       'Email': email,

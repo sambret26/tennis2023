@@ -4,7 +4,6 @@
 from logs import printLogs, printDetails
 import sqlite3
 import logs
-import jsonify
 
 # CONST
 DBNAME = "DB.db"
@@ -268,9 +267,10 @@ def insertPlayer(player):
   connection = connect()
   cursor = connection.cursor()
   query = "INSERT INTO Players (firstname, lastname, ranking, club, mail, SM, SD, DM, DD, DX, C) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
-  values = (player["Firstname"], player["Lastname"], player["Ranking"],
-            player["Club"], player["Email"], player["SM"], player["SD"],
-            player["DM"], player["DD"], player["DX"], player["C"])
+  values = (player["Firstname"].title(), player["Lastname"].upper(),
+            player["Ranking"], player["Club"], player["Email"], player["SM"],
+            player["SD"], player["DM"], player["DD"], player["DX"],
+            player["C"])
   cursor.execute(query, values)
   connection.commit()
   connection.close()
