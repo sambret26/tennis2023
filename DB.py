@@ -52,6 +52,18 @@ def getRankings():
   return rankings
 
 
+def getPlayerIdByName(lastname, firstname):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "SELECT Id FROM Players WHERE Lastname = ? AND Firstname = ?"
+  values = (lastname, firstname)
+  id = cursor.execute(query, values).fetchone()
+  connection.close()
+  if id != None :
+      return id[0]
+  return id
+
+
 def getRankingsByCategory(category):
   connection = connect()
   cursor = connection.cursor()
@@ -218,7 +230,7 @@ def setPlayerToOne(player, id):
 
 def setWinner(id, playerId):
   printLogs(logs.DB, logs.INFO,
-            "Setting winner = {} for match {}".format(winner, id))
+            "Setting winner = {} for match {}".format(playerId, id))
   connection = connect()
   cursor = connection.cursor()
   query = "UPDATE Matchs SET Winner = ?, Finish = 1 WHERE id = ?"
@@ -235,6 +247,66 @@ def setScore(id, score):
   cursor = connection.cursor()
   query = "UPDATE Matchs SET Score = ?, Finish = 1 WHERE id = ?"
   values = (score, id)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
+def setCourt(id, court):
+  printLogs(logs.DB, logs.INFO,
+            "Setting court = {} for match = {}".format(court, id))
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Court = ? WHERE id = ?"
+  values = (int(court), id)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
+def setPlayer1(id, playerId):
+  printLogs(logs.DB, logs.INFO,
+            "Setting player1 = {} for match = {}".format(playerId, id))
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Player1 = ? WHERE id = ?"
+  values = (playerId, id)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
+def setPlayer2(id, playerId):
+  printLogs(logs.DB, logs.INFO,
+            "Setting player2 = {} for match = {}".format(playerId, id))
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Player2 = ? WHERE id = ?"
+  values = (playerId, id)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
+def setDay(id, day):
+  printLogs(logs.DB, logs.INFO,
+            "Setting day = {} for match = {}".format(day, id))
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Day = ? WHERE id = ?"
+  values = (day, id)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
+def setHour(id, hour):
+  printLogs(logs.DB, logs.INFO,
+            "Setting hour = {} for match = {}".format(hour, id))
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Hour = ? WHERE id = ?"
+  values = (hour, id)
   cursor.execute(query, values)
   connection.commit()
   connection.close()
@@ -267,10 +339,9 @@ def insertPlayer(player):
   connection = connect()
   cursor = connection.cursor()
   query = "INSERT INTO Players (firstname, lastname, ranking, club, mail, SM, SD, DM, DD, DX, C) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
-  values = (player["Firstname"].title(), player["Lastname"].upper(),
-            player["Ranking"], player["Club"], player["Email"], player["SM"],
-            player["SD"], player["DM"], player["DD"], player["DX"],
-            player["C"])
+  values = (player["Firstname"], player["Lastname"], player["Ranking"],
+            player["Club"], player["Email"], player["SM"], player["SD"],
+            player["DM"], player["DD"], player["DX"], player["C"])
   cursor.execute(query, values)
   connection.commit()
   connection.close()

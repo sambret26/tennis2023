@@ -52,6 +52,12 @@ async def info(ctx, name=None):
 
 
 @bot.command()
+async def infos(ctx, name=None):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.info(ctx, name)
+
+
+@bot.command()
 async def result(ctx, name=None):
   if ctx.message.guild.id != DB.getGuildID(): return
   await DTF.result(bot, ctx, name)
@@ -64,9 +70,46 @@ async def resultat(ctx, name=None):
 
 
 @bot.command()
+async def modifCourt(ctx, name=None):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.modifCourt(bot, ctx, name)
+
+
+@bot.command()
+async def modifJoueur1(ctx, *args):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.modifJoueur1(ctx, args)
+
+
+@bot.command()
+async def modifJoueur2(ctx, *args):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.modifJoueur2(ctx, args)
+
+
+@bot.command()
+async def modifJour(ctx, *args):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.modifJour(ctx, args)
+
+
+@bot.command()
+async def modifHeure(ctx, *args):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.modifHeure(ctx, args)
+
+
+@bot.command()
+async def modifPg(ctx, *args):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.modifPg(ctx, args)
+
+
+@bot.command()
 @commands.check(isAllowed)
 async def clear(ctx, nombre: int = 100):
   await ctx.channel.purge(limit=nombre + 1, check=lambda msg: not msg.pinned)
+
 
   ### RECURING TASKS
 

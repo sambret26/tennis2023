@@ -5,6 +5,7 @@ c = conn.cursor()
 
 # Drop all tables if exists
 c.execute("DROP TABLE IF EXISTS Players")
+c.execute("DROP TABLE IF EXISTS Teams")
 c.execute("DROP TABLE IF EXISTS Matchs")
 c.execute("DROP TABLE IF EXISTS Channels")
 c.execute("DROP TABLE IF EXISTS PrivateDatas")
@@ -25,6 +26,16 @@ c.execute('''CREATE TABLE Players
              DX INTEGER CHECK (DX IN (0,1)),
              C INTEGER CHECK (C IN (0,1)),
              State INTEGER CHECK (State IN (0,1)))''')
+
+# Create Teams
+c.execute('''CREATE TABLE Teams
+             (Id INTEGER PRIMARY KEY AUTOINCREMENT,
+             Player1 INTEGER,
+             Player2 INTEGER,
+             Ranking INTEGER,
+             DM INTEGER CHECK (DM IN (0,1)),
+             DD INTEGER CHECK (DD IN (0,1)),
+             DX INTEGER CHECK (DX IN (0,1)))''')
 
 # Create Matchs
 c.execute('''CREATE TABLE Matchs
