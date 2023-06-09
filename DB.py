@@ -183,8 +183,19 @@ def getMatchInfosByName(name):
 def getPlayerInfosById(id):
   connection = connect()
   cursor = connection.cursor()
-  query = f"SELECT Firstname, Lastname, Ranking FROM Players WHERE id = {id}"
-  result = cursor.execute(query).fetchone()
+  query = "SELECT Firstname, Lastname, Ranking FROM Players WHERE id = ?"
+  values = (id, )
+  result = cursor.execute(query, values).fetchone()
+  connection.close()
+  return result
+
+
+def getMatchByDate(date):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "SELECT Name, Player1, Player2, Hour, Court FROM Matchs WHERE Day = ?"
+  values = (date, )
+  result = cursor.execute(query, values).fetchall()
   connection.close()
   return result
 

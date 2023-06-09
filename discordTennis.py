@@ -53,8 +53,7 @@ async def info(ctx, name=None):
 
 @bot.command()
 async def infos(ctx, name=None):
-  if ctx.message.guild.id != DB.getGuildID(): return
-  await DTF.info(ctx, name)
+  await info(ctx, name)
 
 
 @bot.command()
@@ -65,8 +64,7 @@ async def result(ctx, name=None):
 
 @bot.command()
 async def resultat(ctx, name=None):
-  if ctx.message.guild.id != DB.getGuildID(): return
-  await DTF.result(bot, ctx, name)
+  await result(ctx, name)
 
 
 @bot.command()
@@ -103,6 +101,22 @@ async def modifHeure(ctx, *args):
 async def modifPg(ctx, *args):
   if ctx.message.guild.id != DB.getGuildID(): return
   await DTF.modifPg(ctx, args)
+
+
+@bot.command()
+async def pg(ctx, *args):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.pg(ctx, args)
+
+
+@bot.command()
+async def programmation(ctx, *args):
+  await pg(ctx, *args)
+
+
+@bot.command()
+async def program(ctx, *args):
+  await pg(ctx, *args)
 
 
 @bot.command()

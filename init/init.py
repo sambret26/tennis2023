@@ -49,6 +49,7 @@ c.execute('''CREATE TABLE Matchs
              Court INTEGER,
              Finish INTEGER CHECK (Finish IN (0,1)),
              Winner INTEGER,
+             Notif INTEGER CHECK (Notif IN (0,1)),
              Score TEXT)''')
 
 # Create Channels

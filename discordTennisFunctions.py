@@ -3,6 +3,7 @@
 # IMPORTS
 from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
 from discord_slash import ButtonStyle
+from datetime import datetime as date
 from logs import printLogs
 import discord
 import tennis
@@ -59,7 +60,7 @@ async def result(bot, ctx, name):
   if matchInfos == None:
     await ctx.send(f"Le match {name} n'a pas été trouvé en base de données")
     return
-  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score = matchInfos
+  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score, notif = matchInfos
   if winnerId != None and score != None:
     res = await yesOrNot(
       bot, ctx,
@@ -198,6 +199,35 @@ async def modifPg(ctx, args):
   await ctx.send(message)
 
 
+async def pg(ctx, args):
+  dates = getDatesFromArgs(args)
+  message = ""
+  matchs = False
+  for date in dates:
+    matchs = DB.getMatchByDate(date)
+    if matchs == None : break
+    message += "Voici la programmation du {}:\n".format(date)
+    for match in matchs:
+      player1 = getPlayerFromPlayerIdInDB(match[1])
+      player2 = getPlayerFromPlayerIdInDB(match[2])
+      message += "{} : {}, {} contre {} sur le court n°{}\n".format(match[3], match[0], player1, player2, match[4])
+      matchs = True
+    message += "\n"
+  if not matchs:
+    message = "Aucune programmation prévue le {}".format(dates[0])
+  await ctx.send(message)
+
+
+def getDatesFromArgs(args):
+  dates = []
+  for arg in args:
+    if not notADay(arg) and not notInTournament(arg):
+      dates.append(arg)
+  if len(dates) == 0:
+    return [date.now().strftime("%d/%m")]
+  return dates
+
+
 async def yesOrNot(bot, ctx, message):
   return await question(bot, ctx, message, [("Oui", "1", "Green"),
                                             ("Non", "0", "Red")])
@@ -304,27 +334,9 @@ async def sendMessagesByCategory(bot, cat, void):
 
 
 def generateMatchMessage(matchInfos):
-  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score = matchInfos
-  if player1Id == None or player1Id == "null":
-    player1 = None
-  elif player1Id.startswith("VS") or player1Id.startswith("VD") or player1Id.startswith("VP"):
-    match = player1Id.lstrip("V")
-    player1 = f"Le vainqueur du match {match}"
-  elif player1Id.startswith("VT"):
-    player1 = "Qualifié entrant"
-  else:
-    p1 = DB.getPlayerInfosById(player1Id)
-    player1 = "{} {} ({})".format(p1[1], p1[0], p1[2])
-  if player2Id == None or player1== "null":
-    player2 = None
-  elif player2Id.startswith("VS") or player2Id.startswith("VD") or player2Id.startswith("VP"):
-    match = player2Id.lstrip("V")
-    player2 = f"Le vainqueur du match {match}"
-  elif player2Id.startswith("VT"):
-    player2 = "Qualifié entrant"
-  else:
-    p2 = DB.getPlayerInfosById(player2Id)
-    player2 = "{} {} ({})".format(p2[1], p2[0], p2[2])
+  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score, notif = matchInfos
+  player1 = getPlayerFromPlayerIdInDB(player1Id)
+  player2 = getPlayerFromPlayerIdInDB(player2Id)
   if finish:
     msg = "Le match {} à opposé {} à {}".format(name, player1, player2)
     if day != None: msg += " le {}".format(day)
@@ -352,6 +364,17 @@ def generateMatchMessage(matchInfos):
     if court != None: msg += " sur le court {}".format(court)
     msg += "."
   return msg
+
+def getPlayerFromPlayerIdInDB(playerIdBD):
+  if playerIdBD == None or playerIdBD == "null":
+    return None
+  if playerIdBD.startswith("VS") or playerIdBD.startswith("VD") or playerIdBD.startswith("VP"):
+    match = playerIdBD.lstrip("V")
+    return "Le vainqueur du match {}".format(match)
+  if playerIdBD.startswith("VT"):
+    return "Qualifié entrant"
+  p1 = DB.getPlayerInfosById(playerIdBD)
+  return "{} {} ({})".format(p1[1], p1[0], p1[2])
 
 
 async def setResult(bot, ctx, id, name, player1Id, player2Id, winner):

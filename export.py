@@ -208,7 +208,7 @@ def insertMatch():
   match = request.args.to_dict()
   connection = connect()
   cursor = connection.cursor()
-  query = "INSERT INTO Matchs (Category, Name, Player1, Player2, Day, Hour, Court, Finish, Winner, Score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  query = "INSERT INTO Matchs (Category, Name, Player1, Player2, Day, Hour, Court, Finish, Winner, Score, Notif) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)"
   values = []
   for value in match.values():
     if (value == "NULL"):
