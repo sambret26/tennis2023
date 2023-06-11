@@ -3,8 +3,7 @@
 # IMPORTS
 from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
 from discord_slash import ButtonStyle
-from datetime import datetime as date
-from logs import printLogs
+from logs import printLogs, getCurrentDate
 import discord
 import tennis
 import logs
@@ -239,7 +238,7 @@ def getDatesFromArgs(args):
     if not notADay(arg) and not notInTournament(arg):
       dates.append(arg)
   if len(dates) == 0:
-    return [date.now().strftime("%d/%m")]
+    return [getCurrentDate().strftime("%d/%m")]
   return dates
 
 
@@ -486,9 +485,9 @@ def convertInHour(hour):
 
 
 async def addNotifMatch():
-  currentDate = date.now().strftime("%d/%m")
-  currentHour = int(date.now().strftime("%H"))
-  currentMinutes = int(date.now().strftime("%M"))
+  currentDate = getCurrentDate().strftime("%d/%m")
+  currentHour = int(getCurrentDate().strftime("%H"))
+  currentMinutes = int(getCurrentDate().strftime("%M"))
   matchs = DB.getMatchsToPlay(currentDate)
   for match in matchs:
     matchHour = int(match[4][0:2])

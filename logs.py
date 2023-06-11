@@ -37,6 +37,6 @@ def printDetails(type1, type2, message):
 # Returns the current date, with an offset if necessary (c.f. jetlag)
 def getCurrentDate():
   offset = 0
-  if "REPLIT" in os.environ:
+  if "Replit" in os.environ:
     offset = 2
   return date.now() + timedelta(seconds=3600 * offset)
