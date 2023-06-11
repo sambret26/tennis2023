@@ -59,8 +59,8 @@ def getPlayerIdByName(lastname, firstname):
   values = (lastname, firstname)
   id = cursor.execute(query, values).fetchone()
   connection.close()
-  if id != None :
-      return id[0]
+  if id != None:
+    return id[0]
   return id
 
 
@@ -190,11 +190,21 @@ def getPlayerInfosById(id):
   return result
 
 
-def getMatchByDate(date):
+def getMatchsByDate(date):
   connection = connect()
   cursor = connection.cursor()
   query = "SELECT Name, Player1, Player2, Hour, Court FROM Matchs WHERE Day = ?"
   values = (date, )
+  result = cursor.execute(query, values).fetchall()
+  connection.close()
+  return result
+
+
+def getMatchsToPlay(date):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "SELECT Id, Name, Player1, Player2, Hour, Court FROM Matchs WHERE Day = ? AND Notif = ?"
+  values = (date, 0)
   result = cursor.execute(query, values).fetchall()
   connection.close()
   return result
@@ -323,6 +333,18 @@ def setHour(id, hour):
   connection.close()
 
 
+def setNotifToSend(id):
+  printLogs(logs.DB, logs.INFO,
+            "Setting notif = 1 for match = {}".format(id))
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Notif = ? WHERE id = ?"
+  values = (1, id)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
 def updatePlayerId(name, playerId):
   printLogs(logs.DB, logs.INFO,
             "Setting player = {} where it was {}".format(playerId, name))
@@ -367,6 +389,20 @@ def addMessage(category, player):
   cursor = connection.cursor()
   query = "INSERT INTO Messages (category, message) VALUES (?, ?)"
   values = (category, message)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
+def addNotif(match, player1, player2):
+  message = "Match {} : {} contre {} prévu à {} sur le court n°{}".format(
+    match[1], player1, player2, match[4], match[5])
+  printLogs(logs.DB, logs.INFO,
+            "Adding notification message {}".format(message))
+  connection = connect()
+  cursor = connection.cursor()
+  query = "INSERT INTO Messages (category, message) VALUES (? ,?)"
+  values = ("NOTIF", message)
   cursor.execute(query, values)
   connection.commit()
   connection.close()

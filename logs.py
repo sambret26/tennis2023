@@ -19,7 +19,7 @@ ERROR = "[ERROR]"
 # Print the date and the message on the file logs/logs.txt
 def printLogs(type1, type2, message):
   printDetails(type1, type2, message)
-  currentDate = str(getCurrentDate().strftime("%d/%m %Hh%M"))
+  currentDate = str(getCurrentDate().strftime("%d/%m %Hh%M:%S"))
   formattedMessage = "{} : {} {} {}\n".format(currentDate, type1, type2,
                                               message)
   with open("./logs/logs.txt", 'a') as f:

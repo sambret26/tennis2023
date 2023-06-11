@@ -11,6 +11,8 @@ from discord_slash import SlashCommand
 import asyncio
 import DB
 import discordTennisFunctions as DTF
+import schedule
+import time
 
 intent = discord.Intents(messages=True, members=True, guilds=True)
 bot = commands.Bot(command_prefix="$", description="Sam's API", intents=intent)
@@ -32,11 +34,10 @@ def isAllowed(ctx):
 
 ### CMD
 
-
 @bot.command()
 async def maj(ctx):
   if ctx.message.guild.id != DB.getGuildID(): return
-  await DTF.maj(bot, void=True)
+  await DTF.maj(bot)
 
 
 @bot.command()
@@ -120,6 +121,22 @@ async def program(ctx, *args):
 
 
 @bot.command()
+async def cmd(ctx):
+  if ctx.message.guild.id != DB.getGuildID(): return
+  await DTF.cmd(ctx)
+
+
+@bot.command()
+async def command():
+  await cmd(ctx)
+
+
+@bot.command()
+async def commandes():
+  await cmd(ctx)
+
+
+@bot.command()
 @commands.check(isAllowed)
 async def clear(ctx, nombre: int = 100):
   await ctx.channel.purge(limit=nombre + 1, check=lambda msg: not msg.pinned)
@@ -127,15 +144,16 @@ async def clear(ctx, nombre: int = 100):
 
   ### RECURING TASKS
 
-
-@bot.event
 async def recurring_task():
   await bot.wait_until_ready()
+
   while not bot.is_closed():
-    await DTF.maj(bot)
-    await asyncio.sleep(60)
+    schedule.run_pending()
+    await asyncio.sleep(1)
 
 
 def main():
+  schedule.every().minute.at(":00").do(lambda: asyncio.create_task(DTF.sendMessages(bot)))
+  schedule.every().minute.at(":30").do(lambda: asyncio.create_task(DTF.maj(bot)))
   bot.loop.create_task(recurring_task())
   bot.run(DB.getDiscordToken())

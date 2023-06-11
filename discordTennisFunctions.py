@@ -11,10 +11,10 @@ import logs
 import DB
 
 
-async def maj(bot, void=False):
+async def maj(bot):
   printLogs(logs.MAJ, logs.INFO, "Updating")
   tennis.main()
-  await sendMessages(bot, void)
+  await addNotifMatch()
 
 
 async def nb(bot, ctx):
@@ -204,7 +204,7 @@ async def pg(ctx, args):
   message = ""
   matchs = False
   for date in dates:
-    matchs = DB.getMatchByDate(date)
+    matchs = DB.getMatchsByDate(date)
     if matchs == None : break
     message += "Voici la programmation du {}:\n".format(date)
     for match in matchs:
@@ -217,6 +217,21 @@ async def pg(ctx, args):
     message = "Aucune programmation prévue le {}".format(dates[0])
   await ctx.send(message)
 
+
+async def cmd(ctx):
+  message = "Voici la liste des commandes disponibles :\n"
+  message += "$maj : mettre à jour la liste des inscrits\n"
+  message += "$nb : connaitre le nombre d'inscrits\n"
+  message += "$info [match] : obtenir des informations sur un match ($infos)\n"
+  message += "$result [match] : enregistrer le résultat d'un match ($resultat)\n"
+  message += "$modifCourt [match] : modifier le court affecté à un match\n"
+  message += "$modifJoueur1 [match] [joueur]: modifier le joueur 1 affecté à un match\n"
+  message += "$modifJoueur2 [match] [joueur]: modifier le joueur 2 affecté à un match\n"
+  message += "$modifJour [match] [jour] : modifier la date affectée à un match\n"
+  message += "$modifHeure [match] [heure]: modifier l'heure affectée à un match\n"
+  message += "$modifiPg [match] [jour] [heure] : modifier la programmation d'un match\n"
+  message += "$pg {jour} : obtenir la programmation des jours données, ou du jour actuel ($program / $programmation)\n"
+  await ctx.send(message)
 
 def getDatesFromArgs(args):
   dates = []
@@ -317,20 +332,19 @@ def numberPlayersByCategory(cat):
     nb, '' if nb < 2 else 's', cat))
 
 
-async def sendMessages(bot, void):
-  for category in ["G", "SM", "SD", "DM", "DD", "DX"]:
-    await sendMessagesByCategory(bot, category, void)
+async def sendMessages(bot):
+  printLogs(logs.MAJ, logs.INFO, "Sending messages")
+  for category in ["G", "SM", "SD", "DM", "DD", "DX", "NOTIF"]:
+    await sendMessagesByCategory(bot, category)
 
 
-async def sendMessagesByCategory(bot, cat, void):
+async def sendMessagesByCategory(bot, cat):
   messages = DB.getMessages(cat)
   channelID = DB.getLogChannelID(cat)
   channel = await bot.fetch_channel(channelID)
   for message in messages:
     await channel.send(message[1])
     DB.deleteMessage(message[0])
-  if cat == "G" and len(messages) == 0 and void:
-    await channel.send("Aucune nouvelle inscription")
 
 
 def generateMatchMessage(matchInfos):
@@ -469,3 +483,18 @@ def convertInHour(hour):
     if hour[0] in ["1", "2"] and hour[1].isdigit() and hour[2].upper() == "H" and hour[3] in ["0", "1", "2", "3", "4", "5"] and hour[4].isdigit():
       return hour.upper()
   return None
+
+
+async def addNotifMatch():
+  currentDate = date.now().strftime("%d/%m")
+  currentHour = int(date.now().strftime("%H"))
+  currentMinutes = int(date.now().strftime("%M"))
+  matchs = DB.getMatchsToPlay(currentDate)
+  for match in matchs:
+    matchHour = int(match[4][0:2])
+    matchMinutes = int(match[4][3:])
+    if ((60*matchHour + matchMinutes) - (60*currentHour + currentMinutes)) <= 16:
+      player1 = getPlayerFromPlayerIdInDB(match[2])
+      player2 = getPlayerFromPlayerIdInDB(match[3])
+      DB.setNotifToSend(match[0])
+      DB.addNotif(match, player1, player2)
