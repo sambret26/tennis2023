@@ -59,7 +59,7 @@ async def result(bot, ctx, name):
   if matchInfos == None:
     await ctx.send(f"Le match {name} n'a pas été trouvé en base de données")
     return
-  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score, notif = matchInfos
+  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, notif, score = matchInfos
   if winnerId != None and score != None:
     res = await yesOrNot(
       bot, ctx,
@@ -82,67 +82,74 @@ async def result(bot, ctx, name):
 async def modifCourt(bot, ctx, name):
   matchName = name.upper()
   matchId = DB.getMatchInfosByName(matchName)[0]
-  if matchId == None :
+  if matchId == None:
     await ctx.send("Match non trouvé {}".format(matchName))
     return
   message = "Sur quel court voulez vous déplacer ce match ?"
-  list = [("Numéro 1", "1", "green"), ("Numéro 2", "2", "blue"), ("Numéro 3", "3", "red")]
+  list = [("Numéro 1", "1", "green"), ("Numéro 2", "2", "blue"),
+          ("Numéro 3", "3", "red")]
   court = await question(bot, ctx, message, list)
   DB.setCourt(matchId, int(court))
-  await ctx.send("Le match {} à été déplacé sur le court {}".format(matchName, court))
+  await ctx.send("Le match {} à été déplacé sur le court {}".format(
+    matchName, court))
 
 
 async def modifJoueur1(ctx, args):
-  if len(args) < 3 :
-      await ctx.send("Veuillez entrer en paramètre un match, un nom et un prénom")
-      return
+  if len(args) < 3:
+    await ctx.send("Veuillez entrer en paramètre un match, un nom, un prénom")
+    return
   matchName = args[0].upper()
   matchId = DB.getMatchInfosByName(matchName)[0]
-  if matchId == None :
-      await ctx.send("Match non trouvé {}".format(matchName))
-      return
+  if matchId == None:
+    await ctx.send("Match non trouvé {}".format(matchName))
+    return
   playerLastname = " ".join(args[1:-1]).upper()
   playerFirstname = args[-1].title()
   playerId = DB.getPlayerIdByName(playerLastname, playerFirstname)
-  if playerId == None :
-      await ctx.send("Joueur non trouvé : {} {}".format(playerLastname, playerFirstname))
-      return
+  if playerId == None:
+    await ctx.send("Joueur non trouvé : {} {}".format(
+      playerLastname, playerFirstname))
+    return
   DB.setPlayer1(matchId, playerId)
-  message = "Le match {} à maintenant comme joueur 1 {} {}".format(matchName, playerLastname, playerFirstname)
+  message = "Le match {} à maintenant comme joueur 1 {} {}".format(
+    matchName, playerLastname, playerFirstname)
   await ctx.send(message)
 
 
 async def modifJoueur2(ctx, args):
-  if len(args) < 3 :
-      await ctx.send("Veuillez entrer en paramètre un match, un nom et un prénom")
-      return
+  if len(args) < 3:
+    await ctx.send("Veuillez entrer en paramètre un match, un nom, prénom")
+    return
   matchName = args[0].upper()
   matchId = DB.getMatchInfosByName(matchName)[0]
-  if matchId == None :
+  if matchId == None:
     await ctx.send("Match non trouvé {}".format(matchName))
     return
   playerLastname = " ".join(args[1:-1]).upper()
   playerFirstname = args[-1].title()
   playerId = DB.getPlayerIdByName(playerLastname, playerFirstname)
-  if playerId == None :
-      await ctx.send("Joueur non trouvé : {} {}".format(playerLastname, playerFirstname))
+  if playerId == None:
+      await ctx.send("Joueur non trouvé : {} {}".format(
+        playerLastname, playerFirstname))
       return
   DB.setPlayer2(matchId, playerId)
-  message = "Le match {} à maintenant comme joueur 2 {} {}".format(matchName, playerLastname, playerFirstname)
+  message = "Le match {} à maintenant comme joueur 2 {} {}".format(
+    matchName, playerLastname, playerFirstname)
   await ctx.send(message)
 
 
 async def modifJour(ctx, args):
-  if len(args) != 2 :
-      await ctx.send("Veuillez entrer en paramètre un match et un jour au format dd/mm")
-      return
+  if len(args) != 2:
+    await ctx.send(
+      "Veuillez entrer en paramètre un match et un jour au format dd/mm")
+    return
   matchName = args[0].upper()
   matchId = DB.getMatchInfosByName(matchName)[0]
-  if matchId == None :
+  if matchId == None:
     await ctx.send("Match non trouvé {}".format(matchName))
     return
   day = args[1]
-  if len(day) == 4 : day = "0" + day
+  if len(day) == 4: day = "0" + day
   if notADay(day):
     await ctx.send("Veuillez rentrer un jour au format dd/mm")
     return
@@ -155,12 +162,12 @@ async def modifJour(ctx, args):
 
 
 async def modifHeure(ctx, args):
-  if len(args) != 2 :
-      await ctx.send("Veuillez entrer en paramètre un match et une heure")
-      return
+  if len(args) != 2:
+    await ctx.send("Veuillez entrer en paramètre un match et une heure")
+    return
   matchName = args[0].upper()
   matchId = DB.getMatchInfosByName(matchName)[0]
-  if matchId == None :
+  if matchId == None:
     await ctx.send("Match non trouvé {}".format(matchName))
     return
   hour = convertInHour(args[1])
@@ -168,20 +175,21 @@ async def modifHeure(ctx, args):
     await ctx.send("L'heure entrée n'est pas correcte")
     return
   DB.setHour(matchId, hour)
-  message = "Le match {} est programmé à {}".format(matchName, hour) #TODO?
+  message = "Le match {} est programmé à {}".format(matchName, hour)
   await ctx.send(message)
 
 async def modifPg(ctx, args):
   if len(args) != 3 :
-      await ctx.send("Veuillez entrer en paramètre un match, un jour au format dd/mm et une heure")
-      return
+    await ctx.send("Veuillez entrer en paramètre un match,\
+                       un jour au format dd/mm et une heure")
+    return
   matchName = args[0].upper()
   matchId = DB.getMatchInfosByName(matchName)[0]
   if matchId == None :
     await ctx.send("Match non trouvé {}".format(matchName))
     return
   day = args[1]
-  if len(day) == 4 : day = "0" + day
+  if len(day) == 4: day = "0" + day
   if notADay(day):
     await ctx.send("Veuillez rentrer un jour au format dd/mm")
     return
@@ -194,7 +202,8 @@ async def modifPg(ctx, args):
     return
   DB.setDay(matchId, day)
   DB.setHour(matchId, hour)
-  message = "Le match {} est programmé pour le {} à {}".format(matchName, day, hour)
+  message = "Le match {} est programmé pour le {} à {}".format(
+    matchName, day, hour)
   await ctx.send(message)
 
 
@@ -204,12 +213,13 @@ async def pg(ctx, args):
   matchs = False
   for date in dates:
     matchs = DB.getMatchsByDate(date)
-    if matchs == None : break
+    if matchs == None: break
     message += "Voici la programmation du {}:\n".format(date)
     for match in matchs:
       player1 = getPlayerFromPlayerIdInDB(match[1])
       player2 = getPlayerFromPlayerIdInDB(match[2])
-      message += "{} : {}, {} contre {} sur le court n°{}\n".format(match[3], match[0], player1, player2, match[4])
+      message += "{} : {}, {} contre {} sur le court n°{}\n".format(
+        match[3], match[0], player1, player2, match[4])
       matchs = True
     message += "\n"
   if not matchs:
@@ -231,6 +241,7 @@ async def cmd(ctx):
   message += "$modifiPg [match] [jour] [heure] : modifier la programmation d'un match\n"
   message += "$pg {jour} : obtenir la programmation des jours données, ou du jour actuel ($program / $programmation)\n"
   await ctx.send(message)
+
 
 def getDatesFromArgs(args):
   dates = []
@@ -358,8 +369,8 @@ def generateMatchMessage(matchInfos):
     msg += "."
     if winnerId != None:
       winner = player2
-      if winnerId == player1Id: winner = player1
-      msg += " Il à été gagné par {}".format(winner.split("(")[0])
+      if int(winnerId) == int(player1Id): winner = player1
+      msg += " Il a été gagné par {}".format(winner.split("(")[0])
       if score != None:
         msg += " ({})".format(score)
       msg += "."
@@ -378,10 +389,12 @@ def generateMatchMessage(matchInfos):
     msg += "."
   return msg
 
+
 def getPlayerFromPlayerIdInDB(playerIdBD):
   if playerIdBD == None or playerIdBD == "null":
     return None
-  if playerIdBD.startswith("VS") or playerIdBD.startswith("VD") or playerIdBD.startswith("VP"):
+  if playerIdBD.startswith("VS") or playerIdBD.startswith("VD") or\
+   playerIdBD.startswith("VP"):
     match = playerIdBD.lstrip("V")
     return "Le vainqueur du match {}".format(match)
   if playerIdBD.startswith("VT"):
@@ -438,7 +451,7 @@ def thirdSet(set1, set2):
   return win < 2
 
 def notADay(day):
-  if len(day) !=5 :
+  if len(day) !=5:
     return True
   if day[2] != "/":
     return True
@@ -448,12 +461,15 @@ def notADay(day):
     return True
   return False
 
+
 def notInTournament(day):
-  if day.split("/")[1] == "06" and int(day.split("/")[0]) > 18 and int(day.split("/")[1]) <31:
+  if day.split("/")[1] == "06" and int(day.split("/")[0]) > 18 and\
+   int(day.split("/")[1]) <31:
     return False
   if day in ["01/07", "02/07"]:
     return False
   return True
+
 
 def convertInHour(hour):
   if len(hour) == 2:
@@ -467,19 +483,26 @@ def convertInHour(hour):
       return hour[1:].upper()
     return None
   if len(hour) == 4:
-    if hour[0].isdigit() and hour[1].upper() == "H" and hour[2] == "0" and hour[3] == "0":
+    if hour[0].isdigit() and hour[1].upper() == "H" and\
+     hour[2] == "0" and hour[3] == "0":
       return hour[:2].upper()
-    if hour[0].isdigit() and hour[1].upper() == "H" and hour[2] in ["0", "1", "2", "3", "4", "5"] and hour[3].isdigit():
+    if hour[0].isdigit() and hour[1].upper() == "H"and\
+     hour[2] in ["0", "1", "2", "3", "4", "5"] and hour[3].isdigit():
       return hour.upper()
     return None
   if len(hour) == 5:
-    if hour[0] == "0" and hour[1].isdigit() and hour[2].upper() == "H" and hour[3] == "0" and hour[4] == "0":
+    if hour[0] == "0" and hour[1].isdigit() and hour[2].upper() == "H" and\
+     hour[3] == "0" and hour[4] == "0":
       return hour[1:3].upper()
-    if hour[0] == "0" and hour[1].isdigit() and hour[2].upper() == "H" and hour[3] in ["0", "1", "2", "3", "4", "5"] and hour[4].isdigit():
+    if hour[0] == "0" and hour[1].isdigit() and hour[2].upper() == "H" and\
+     hour[3] in ["0", "1", "2", "3", "4", "5"] and hour[4].isdigit():
       return hour[:3].upper()
-    if hour[0] in ["1", "2"] and hour[1].isdigit() and hour[2].upper() == "H" and hour[3] == "0" and hour[4] == "0":
+    if hour[0] in ["1", "2"] and hour[1].isdigit() and\
+     hour[2].upper() == "H" and hour[3] == "0" and hour[4] == "0":
       return hour[:3].upper()
-    if hour[0] in ["1", "2"] and hour[1].isdigit() and hour[2].upper() == "H" and hour[3] in ["0", "1", "2", "3", "4", "5"] and hour[4].isdigit():
+    if hour[0] in ["1", "2"] and hour[1].isdigit() and hour[2].upper(
+     ) == "H" and hour[3] in ["0", "1", "2", "3", "4", "5"] and\
+      hour[4].isdigit():
       return hour.upper()
   return None
 
@@ -492,7 +515,8 @@ async def addNotifMatch():
   for match in matchs:
     matchHour = int(match[4][0:2])
     matchMinutes = int(match[4][3:])
-    if ((60*matchHour + matchMinutes) - (60*currentHour + currentMinutes)) <= 16:
+    if ((60*matchHour + matchMinutes) -
+      (60*currentHour + currentMinutes)) <= 16:
       player1 = getPlayerFromPlayerIdInDB(match[2])
       player2 = getPlayerFromPlayerIdInDB(match[3])
       DB.setNotifToSend(match[0])

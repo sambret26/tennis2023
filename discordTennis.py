@@ -34,6 +34,7 @@ def isAllowed(ctx):
 
 ### CMD
 
+
 @bot.command()
 async def maj(ctx):
   if ctx.message.guild.id != DB.getGuildID(): return
@@ -127,12 +128,12 @@ async def cmd(ctx):
 
 
 @bot.command()
-async def command():
+async def command(ctx):
   await cmd(ctx)
 
 
 @bot.command()
-async def commandes():
+async def commandes(ctx):
   await cmd(ctx)
 
 
@@ -141,8 +142,8 @@ async def commandes():
 async def clear(ctx, nombre: int = 100):
   await ctx.channel.purge(limit=nombre + 1, check=lambda msg: not msg.pinned)
 
-
   ### RECURING TASKS
+
 
 async def recurring_task():
   await bot.wait_until_ready()
@@ -153,7 +154,9 @@ async def recurring_task():
 
 
 def main():
-  schedule.every().minute.at(":00").do(lambda: asyncio.create_task(DTF.sendMessages(bot)))
-  schedule.every().minute.at(":30").do(lambda: asyncio.create_task(DTF.maj(bot)))
+  schedule.every().minute.at(":00").do(
+    lambda: asyncio.create_task(DTF.sendMessages(bot)))
+  schedule.every().minute.at(":30").do(
+    lambda: asyncio.create_task(DTF.maj(bot)))
   bot.loop.create_task(recurring_task())
   bot.run(DB.getDiscordToken())
