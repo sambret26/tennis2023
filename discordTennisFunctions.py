@@ -59,7 +59,7 @@ async def result(bot, ctx, name):
   if matchInfos == None:
     await ctx.send(f"Le match {name} n'a pas été trouvé en base de données")
     return
-  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, notif, score = matchInfos
+  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, notif, score, calid = matchInfos
   if winnerId != None and score != None:
     res = await yesOrNot(
       bot, ctx,
@@ -358,7 +358,7 @@ async def sendMessagesByCategory(bot, cat):
 
 
 def generateMatchMessage(matchInfos):
-  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score, notif = matchInfos
+  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score, notif, calid = matchInfos
   player1 = getPlayerFromPlayerIdInDB(player1Id)
   player2 = getPlayerFromPlayerIdInDB(player2Id)
   if finish:
