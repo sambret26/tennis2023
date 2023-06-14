@@ -7,3 +7,4 @@ venv/
 pyproject.toml
 replit.nix
 poetry.lock
+DB/
