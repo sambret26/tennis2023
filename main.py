@@ -8,6 +8,7 @@ sys.path.append("modules")
 import discordTennis
 import export
 import threading
+import cal
 import os
 
 # KEEPING ALIVE (en cas de deploiement sur replit)
@@ -19,6 +20,8 @@ if "Replit" in os.environ:
 def main():
   thread1 = threading.Thread(target=export.main)
   thread1.start()
+  thread2 = threading.Thread(target=cal.main)
+  thread2.start()
   discordTennis.main()
 
 

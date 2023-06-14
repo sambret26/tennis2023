@@ -127,11 +127,28 @@ def getSamID():
   return getPrivateData("SamID")
 
 
+def getCalendarID():
+  return getPrivateData("CalendarID")
+
+
+def getCalendarStatus():
+  return getPrivateData("CalendarStatus")
+
+
 def getGuildID():
   connection = connect()
   cursor = connection.cursor()
   query = "SELECT ChannelID FROM Channels WHERE Category = 'GuildID'"
   data = cursor.execute(query).fetchone()[0]
+  connection.close()
+  return data
+
+
+def getMatchs():
+  connection = connect()
+  cursor = connection.cursor()
+  query = "SELECT * FROM Matchs"
+  data = cursor.execute(query).fetchall()
   connection.close()
   return data
 
@@ -223,12 +240,35 @@ def searchPlayer(player):
   ### SETTERS
 
 
+def setCalendarStatus(status):
+  printDetails(logs.DB, logs.INFO, f"Setting CalendarStatus to {status}")
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE PrivateDatas SET Data = ? WHERE Type = ?"
+  values = (status, "CalendarStatus")
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
 def setAllPlayersToZero():
   printDetails(logs.DB, logs.INFO, "Setting all players to unfind")
   connection = connect()
   cursor = connection.cursor()
   query = "UPDATE Players SET state = 0"
   cursor.execute(query)
+  connection.commit()
+  connection.close()
+
+
+def updateEvent(id, calId):
+  printDetails(logs.DB, logs.INFO, "Setting calId to {} for {}".format(
+    calId, id))
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET calId = ? WHERE id = ?"
+  values = (calId, id)
+  cursor.execute(query, values)
   connection.commit()
   connection.close()
 
