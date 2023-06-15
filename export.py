@@ -223,5 +223,22 @@ def insertMatch():
   return response
 
 
+@app.route('modifMatch', methods=['Post'])
+def modifMatch():
+  match = request.args.to_dict()
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET Player1 = ?, Player2 = ?, Day = ?, Hour = ?, Court = ?, Finish = ?, Winner = ?, Score = ?, Notif = ? WHERE Name = ?"
+  values = []
+  for value in ["Player1", "Player2", "Day", "Hour", "Court", "Finish", "Winner", "Score", "Notif", "Name"]
+    values.append(match[value] if match[value] != "NULL" else None)
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+  response = {"status": 201}
+  return response
+
+
+
 def main():
   app.run(host="0.0.0.0", port=8070)
