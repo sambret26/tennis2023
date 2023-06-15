@@ -210,9 +210,25 @@ def getMatchInfosById(id):
 def getPlayerInfosById(id):
   connection = connect()
   cursor = connection.cursor()
-  query = "SELECT Firstname, Lastname, Ranking FROM Players WHERE id = ?"
+  query = "SELECT Firstname, Lastname, Ranking FROM Players WHERE Id = ?"
   values = (id, )
   result = cursor.execute(query, values).fetchone()
+  connection.close()
+  return result
+
+
+def getTeamInfosById(id):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "SELECT Player1, Player2, Ranking FROM Teams WHERE Id = ?"
+  values = (id, )
+  (id1, id2, ranking) = cursor.execute(query, values).fetchone()
+  query = "SELECT Lastname FROM Players WHERE Id = ?"
+  values = (id1, )
+  player1 = cursor.execute(query, values).fetchone()[0]
+  values = (id2, )
+  player2 = cursor.execute(query, values).fetchone()[0]
+  result = "{} et {} ({})".format(player1, player2, ranking)
   connection.close()
   return result
 
@@ -406,6 +422,17 @@ def updatePlayerId(name, playerId):
   query = "UPDATE Matchs SET Player2 = ? WHERE Player2 = ?"
   values = (playerId, name)
   cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+
+
+def removeCalId():
+  printLogs(logs.DB, logs.INFO,
+            "Removing all events")
+  connection = connect()
+  cursor = connection.cursor()
+  query = "UPDATE Matchs SET CalId = NULL"
+  cursor.execute(query)
   connection.commit()
   connection.close()
 

@@ -158,6 +158,21 @@ async def updateCal(ctx):
 
 
 @bot.command()
+async def uc(ctx):
+  await cal.update(ctx)
+
+
+@bot.command()
+async def deleteCal(ctx):
+  await cal.deleteCal(ctx)
+
+
+@bot.command()
+async def dc(ctx):
+  await cal.deleteCal(ctx)
+
+
+@bot.command()
 async def cmd(ctx):
   if ctx.message.guild.id != DB.getGuildID(): return
   await DTF.cmd(ctx)

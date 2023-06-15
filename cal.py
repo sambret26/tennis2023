@@ -135,6 +135,23 @@ def findCreds():
   return creds
 
 
+async def deleteCal(ctx):
+  await ctx.send("Suppression des evenements\n\
+Attention, le traitement peut-être long, et mettre en pause \
+le reste des opérations")
+  creds = findCreds()
+  calendarId = DB.getCalendarID()
+  service = build('calendar', 'v3', credentials=creds)
+  eventsResult = service.events().list(calendarId=calendarId,\
+    singleEvents=True, orderBy='startTime').execute()
+  events = eventsResult.get('items', [])
+  for event in events :
+    service.events().delete(calendarId=calendarId,\
+      eventId=event['id']).execute()
+  DB.removeCalId()
+  await ctx.send("Suppression des evenements terminé")
+
+
 async def update(ctx):
   await ctx.send("Mise à jour du calendrier\n\
 Attention, le traitement peut-être long, et mettre en pause \

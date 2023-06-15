@@ -223,8 +223,8 @@ async def pg(ctx, args):
     if matchs == None: break
     message += "Voici la programmation du {}:\n".format(date)
     for match in matchs:
-      player1 = getPlayerFromPlayerIdInDB(match[1])
-      player2 = getPlayerFromPlayerIdInDB(match[2])
+      player1 = getPlayerFromPlayerIdInDB(match[0], match[1])
+      player2 = getPlayerFromPlayerIdInDB(match[0], match[2])
       message += "{} : {}, {} contre {} sur le court n°{}\n".format(
         match[3], match[0], player1, player2, match[4])
       matchs = True
@@ -367,8 +367,8 @@ async def sendMessagesByCategory(bot, cat):
 
 def generateMatchMessage(matchInfos):
   id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score, notif, calid = matchInfos
-  player1 = getPlayerFromPlayerIdInDB(player1Id)
-  player2 = getPlayerFromPlayerIdInDB(player2Id)
+  player1 = getPlayerFromPlayerIdInDB(cat, player1Id)
+  player2 = getPlayerFromPlayerIdInDB(cat, player2Id)
   if finish:
     msg = "Le match {} à opposé {} à {}".format(name, player1, player2)
     if day != None: msg += " le {}".format(day)
@@ -398,17 +398,19 @@ def generateMatchMessage(matchInfos):
   return msg
 
 
-def getPlayerFromPlayerIdInDB(playerIdBD):
-  if playerIdBD == None or playerIdBD == "null":
+def getPlayerFromPlayerIdInDB(cat, playerIdDB):
+  if playerIdDB == None or playerIdDB == "null":
     return None
-  if playerIdBD.startswith("VS") or playerIdBD.startswith("VD") or\
-   playerIdBD.startswith("VP"):
-    match = playerIdBD.lstrip("V")
+  if playerIdDB.startswith("VS") or playerIdDB.startswith("VD") or\
+   playerIdDB.startswith("VP"):
+    match = playerIdDB.lstrip("V")
     return "Le vainqueur du match {}".format(match)
-  if playerIdBD.startswith("VT"):
+  if playerIdDB.startswith("VT"):
     return "Qualifié entrant"
-  p1 = DB.getPlayerInfosById(playerIdBD)
-  return "{} {} ({})".format(p1[1], p1[0], p1[2])
+  if cat.startswith("S") :
+    p1 = DB.getPlayerInfosById(playerIdDB)
+    return "{} {} ({})".format(p1[1], p1[0], p1[2])
+  return DB.getTeamInfosById(playerIdDB)
 
 
 async def setResult(bot, ctx, id, name, player1Id, player2Id, winner):
@@ -525,7 +527,7 @@ async def addNotifMatch():
     matchMinutes = int(match[4][3:])
     if ((60*matchHour + matchMinutes) -
       (60*currentHour + currentMinutes)) <= 16:
-      player1 = getPlayerFromPlayerIdInDB(match[2])
-      player2 = getPlayerFromPlayerIdInDB(match[3])
+      player1 = getPlayerFromPlayerIdInDB(match[1], match[2])
+      player2 = getPlayerFromPlayerIdInDB(match[1], match[3])
       DB.setNotifToSend(match[0])
       DB.addNotif(match, player1, player2)
