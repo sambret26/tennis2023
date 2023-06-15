@@ -2,7 +2,6 @@
 
 # IMPORTS
 from google_auth_oauthlib.flow import InstalledAppFlow as IAF
-from discordTennisFunctions import getPlayerFromPlayerIdInDB
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from logs import printDetails, printLogs
@@ -101,6 +100,19 @@ def getEnd(day, hour):
  return "2023-{}-{}T{}:{}:00".format(m, d, h, min)
 
 
+def getPlayerFromPlayerIdInDB(playerIdBD):
+  if playerIdBD == None or playerIdBD == "null":
+    return None
+  if playerIdBD.startswith("VS") or playerIdBD.startswith("VD") or\
+   playerIdBD.startswith("VP"):
+    match = playerIdBD.lstrip("V")
+    return "Le vainqueur du match {}".format(match)
+  if playerIdBD.startswith("VT"):
+    return "Qualifié entrant"
+  p1 = DB.getPlayerInfosById(playerIdBD)
+  return "{} {} ({})".format(p1[1], p1[0], p1[2])
+
+
 def load(name):
   with open('DB/' + name + '.pkl', 'rb') as f:
     return pickle.load(f)
@@ -123,36 +135,54 @@ def findCreds():
   return creds
 
 
-def update():
+async def update(ctx):
+  await ctx.send("Mise à jour du calendrier\n\
+Attention, le traitement peut-être long, et mettre en pause \
+le reste des opérations")
   printLogs(logs.CAL, logs.INFO, "Updating calendar")
   DB.setCalendarStatus(1)
   eventsInDB = DB.getMatchs()
   for eventInDB in eventsInDB:
-    id = eventInDB[0]
-    idCal = eventInDB[12]
-    if(idCal != None):
-      eventInCal = getEvent(idCal)
-      diff = compare(eventInDB, eventInCal)
-      if (diff):
-        printDetails(logs.CAL, logs.INFO,
-          "Modification in calendar of match {}".format(id))
-        try:
-          deleteEvent(idCal)
-          idCal = createEvent(eventInDB)
-          DB.updateEvent(id, idCal)
-        except:
-          printDetails(logs.CAL, logs.ERROR,
-            "Error modificating in calendar match {}".format(id))
-    else:
+    updateSingleEvent(eventInDB)
+  printDetails(logs.CAL, logs.INFO, "End of calendar update")
+  DB.setCalendarStatus(0)
+  await ctx.send("Fin de la mise à jour du calendrier")
+
+
+def updateSingleEvent(eventInDB):
+  id = eventInDB[0]
+  idCal = eventInDB[12]
+  if(idCal != None):
+    eventInCal = getEvent(idCal)
+    diff = compare(eventInDB, eventInCal)
+    if (diff):
       printDetails(logs.CAL, logs.INFO,
-        "Creation in calendar of match {}".format(id))
-      #try:
+        "Modification in calendar of match {}".format(id))
+      try:
+        deleteEvent(idCal)
+        idCal = createEvent(eventInDB)
+        DB.updateEvent(id, idCal)
+      except:
+        printDetails(logs.CAL, logs.ERROR,
+          "Error modificating in calendar match {}".format(id))
+  else:
+    printDetails(logs.CAL, logs.INFO,
+      "Creation in calendar of match {}".format(id))
+    try:
       idCal = createEvent(eventInDB)
       DB.updateEvent(id, idCal)
-      #except:
-        #printDetails(logs.CAL, logs.ERROR,
-         # "Error creating in calendar match {}".format(id))
-  printDetails(logs.CAL, logs.INFO, "End of calendar update")
+    except:
+      printDetails(logs.CAL, logs.ERROR,
+        "Error creating in calendar match {}".format(id))
+
+
+def updateOneEvent(id):
+  eventInDB = DB.getMatchInfosById(id)
+  if(DB.getCalendarStatus() == 1) : return
+  printDetails(logs.CAL, logs.INFO, "Updating event {}".format(id))
+  DB.setCalendarStatus(1)
+  updateSingleEvent(eventInDB)
+  printDetails(logs.CAL, logs.INFO, "End updating event {}".format(id))
   DB.setCalendarStatus(0)
 
 
@@ -166,4 +196,4 @@ def launch_update():
       "Updating already running...")
 
 def main():
-  schedule.every().minute.at(":00").do(launch_update)
+  schedule.every().day.at("04:00").do(launch_update)

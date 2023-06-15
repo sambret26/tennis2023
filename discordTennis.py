@@ -13,6 +13,7 @@ import DB
 import discordTennisFunctions as DTF
 import schedule
 import time
+import cal
 
 intent = discord.Intents(messages=True, members=True, guilds=True)
 bot = commands.Bot(command_prefix="$", description="Sam's API", intents=intent)
@@ -76,9 +77,19 @@ async def modifCourt(ctx, name=None):
 
 
 @bot.command()
+async def mc(ctx, name=None):
+  await modifCourt(ctx, name)
+
+
+@bot.command()
 async def modifJoueur1(ctx, *args):
   if ctx.message.guild.id != DB.getGuildID(): return
   await DTF.modifJoueur1(ctx, args)
+
+
+@bot.command()
+async def mj1(ctx, *args):
+  await modifJoueur1(ctx, *args)
 
 
 @bot.command()
@@ -88,9 +99,19 @@ async def modifJoueur2(ctx, *args):
 
 
 @bot.command()
+async def mj2(ctx, *args):
+  await modifJoueur2(ctx, *args)
+
+
+@bot.command()
 async def modifJour(ctx, *args):
   if ctx.message.guild.id != DB.getGuildID(): return
   await DTF.modifJour(ctx, args)
+
+
+@bot.command()
+async def mj(ctx, *args):
+  await modifJour(ctx, *args)
 
 
 @bot.command()
@@ -100,9 +121,19 @@ async def modifHeure(ctx, *args):
 
 
 @bot.command()
+async def mh(ctx, *args):
+  await modifHeure(ctx, *args)
+
+
+@bot.command()
 async def modifPg(ctx, *args):
   if ctx.message.guild.id != DB.getGuildID(): return
   await DTF.modifPg(ctx, args)
+
+
+@bot.command()
+async def mpg(ctx, *args):
+  await modifPg(ctx, *args)
 
 
 @bot.command()
@@ -119,6 +150,11 @@ async def programmation(ctx, *args):
 @bot.command()
 async def program(ctx, *args):
   await pg(ctx, *args)
+
+
+@bot.command()
+async def updateCal(ctx):
+  await cal.update(ctx)
 
 
 @bot.command()

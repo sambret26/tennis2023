@@ -197,6 +197,16 @@ def getMatchInfosByName(name):
   return result
 
 
+def getMatchInfosById(id):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "SELECT * FROM Matchs WHERE Id = ?"
+  values = (id, )
+  result = cursor.execute(query, values).fetchone()
+  connection.close()
+  return result
+
+
 def getPlayerInfosById(id):
   connection = connect()
   cursor = connection.cursor()
@@ -274,11 +284,11 @@ def updateEvent(id, calId):
 
 
 def setPlayerToOne(player, id):
-  printDetails(
-    logs.DB, logs.INFO,
-    "Setting SM = {}, SD = {}, DM = {}, DD = {}, DX = {} for {} {} ".format(
-      player["SM"], player["SD"], player["DM"], player["DD"], player["DX"],
-      player["Firstname"], player["Lastname"]))
+  # printDetails(
+  #   logs.DB, logs.INFO,
+  #   "Setting SM = {}, SD = {}, DM = {}, DD = {}, DX = {} for {} {} ".format(
+  #     player["SM"], player["SD"], player["DM"], player["DD"], player["DX"],
+  #     player["Firstname"], player["Lastname"]))
   connection = connect()
   cursor = connection.cursor()
   query = "UPDATE Players SET state = 1, SM = ?, SD = ?, DM = ?, DD = ?, DX = ?, C = ? WHERE id = ?"

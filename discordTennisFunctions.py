@@ -7,6 +7,7 @@ from logs import printLogs, getCurrentDate
 import discord
 import tennis
 import logs
+import cal
 import DB
 
 
@@ -90,6 +91,7 @@ async def modifCourt(bot, ctx, name):
           ("Numéro 3", "3", "red")]
   court = await question(bot, ctx, message, list)
   DB.setCourt(matchId, int(court))
+  cal.updateOneEvent(matchId)
   await ctx.send("Le match {} à été déplacé sur le court {}".format(
     matchName, court))
 
@@ -113,6 +115,7 @@ async def modifJoueur1(ctx, args):
   DB.setPlayer1(matchId, playerId)
   message = "Le match {} à maintenant comme joueur 1 {} {}".format(
     matchName, playerLastname, playerFirstname)
+  cal.updateOneEvent(matchId)
   await ctx.send(message)
 
 
@@ -129,12 +132,13 @@ async def modifJoueur2(ctx, args):
   playerFirstname = args[-1].title()
   playerId = DB.getPlayerIdByName(playerLastname, playerFirstname)
   if playerId == None:
-      await ctx.send("Joueur non trouvé : {} {}".format(
-        playerLastname, playerFirstname))
-      return
+    await ctx.send("Joueur non trouvé : {} {}".format(
+      playerLastname, playerFirstname))
+    return
   DB.setPlayer2(matchId, playerId)
   message = "Le match {} à maintenant comme joueur 2 {} {}".format(
     matchName, playerLastname, playerFirstname)
+  cal.updateOneEvent(matchId)
   await ctx.send(message)
 
 
@@ -158,6 +162,7 @@ async def modifJour(ctx, args):
     return
   DB.setDay(matchId, day)
   message = "Le match {} est programmé pour le {}".format(matchName, day)
+  cal.updateOneEvent(matchId)
   await ctx.send(message)
 
 
@@ -176,6 +181,7 @@ async def modifHeure(ctx, args):
     return
   DB.setHour(matchId, hour)
   message = "Le match {} est programmé à {}".format(matchName, hour)
+  cal.updateOneEvent(matchId)
   await ctx.send(message)
 
 async def modifPg(ctx, args):
@@ -204,6 +210,7 @@ async def modifPg(ctx, args):
   DB.setHour(matchId, hour)
   message = "Le match {} est programmé pour le {} à {}".format(
     matchName, day, hour)
+  cal.updateOneEvent(matchId)
   await ctx.send(message)
 
 
@@ -233,13 +240,14 @@ async def cmd(ctx):
   message += "$nb : connaitre le nombre d'inscrits\n"
   message += "$info [match] : obtenir des informations sur un match ($infos)\n"
   message += "$result [match] : enregistrer le résultat d'un match ($resultat)\n"
-  message += "$modifCourt [match] : modifier le court affecté à un match\n"
-  message += "$modifJoueur1 [match] [joueur]: modifier le joueur 1 affecté à un match\n"
-  message += "$modifJoueur2 [match] [joueur]: modifier le joueur 2 affecté à un match\n"
-  message += "$modifJour [match] [jour] : modifier la date affectée à un match\n"
-  message += "$modifHeure [match] [heure]: modifier l'heure affectée à un match\n"
-  message += "$modifiPg [match] [jour] [heure] : modifier la programmation d'un match\n"
+  message += "$modifCourt [match] : modifier le court affecté à un match ($mc)'\n"
+  message += "$modifJoueur1 [match] [joueur]: modifier le joueur 1 affecté à un match ($mj1)\n"
+  message += "$modifJoueur2 [match] [joueur]: modifier le joueur 2 affecté à un match ($mj2)\n"
+  message += "$modifJour [match] [jour] : modifier la date affectée à un match ($mj)\n"
+  message += "$modifHeure [match] [heure]: modifier l'heure affectée à un match ($mh)\n"
+  message += "$modifiPg [match] [jour] [heure] : modifier la programmation d'un match ($mpg)\n"
   message += "$pg {jour} : obtenir la programmation des jours données, ou du jour actuel ($program / $programmation)\n"
+  message == "$updateCal : mettre à jour tout les évènements (attention, chargement assez long)\n"
   await ctx.send(message)
 
 
