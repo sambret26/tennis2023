@@ -47,8 +47,8 @@ def createEvent(event):
 
 
 def generateEvent(event):
-  player1 = getPlayerFromPlayerIdInDB(event[0], event[3])
-  player2 = getPlayerFromPlayerIdInDB(event[0], event[4])
+  player1 = getPlayerFromPlayerIdInDB(event[1], event[3])
+  player2 = getPlayerFromPlayerIdInDB(event[1], event[4])
   timezone = "Europe/Paris"
   newEvent = {
     "summary": event[2],
