@@ -20,8 +20,6 @@ if "Replit" in os.environ:
 def main():
   thread1 = threading.Thread(target=export.main)
   thread1.start()
-  thread2 = threading.Thread(target=cal.main)
-  thread2.start()
   discordTennis.main()
 
 
