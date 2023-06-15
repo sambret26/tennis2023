@@ -100,17 +100,19 @@ def getEnd(day, hour):
  return "2023-{}-{}T{}:{}:00".format(m, d, h, min)
 
 
-def getPlayerFromPlayerIdInDB(playerIdBD):
-  if playerIdBD == None or playerIdBD == "null":
+def getPlayerFromPlayerIdInDB(cat, playerIdDB):
+  if playerIdDB == None or playerIdDB == "null":
     return None
-  if playerIdBD.startswith("VS") or playerIdBD.startswith("VD") or\
-   playerIdBD.startswith("VP"):
-    match = playerIdBD.lstrip("V")
+  if playerIdDB.startswith("VS") or playerIdDB.startswith("VD") or\
+   playerIdDB.startswith("VP"):
+    match = playerIdDB.lstrip("V")
     return "Le vainqueur du match {}".format(match)
-  if playerIdBD.startswith("VT"):
+  if playerIdDB.startswith("VT"):
     return "Qualifié entrant"
-  p1 = DB.getPlayerInfosById(playerIdBD)
-  return "{} {} ({})".format(p1[1], p1[0], p1[2])
+  if cat.startswith("S") :
+    p1 = DB.getPlayerInfosById(playerIdDB)
+    return "{} {} ({})".format(p1[1], p1[0], p1[2])
+  return DB.getTeamInfosById(playerIdDB)
 
 
 def load(name):
