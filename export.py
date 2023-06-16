@@ -230,7 +230,7 @@ def modifMatch():
   cursor = connection.cursor()
   query = "UPDATE Matchs SET Player1 = ?, Player2 = ?, Day = ?, Hour = ?, Court = ?, Finish = ?, Winner = ?, Score = ?, Notif = 0 WHERE Name = ?"
   values = []
-  for value in ["Player1", "Player2", "Day", "Hour", "Court", "Finish", "Winner", "Score", "Name"]
+  for value in ["Player1", "Player2", "Day", "Hour", "Court", "Finish", "Winner", "Score", "Name"]:
     values.append(match[value] if match[value] != "NULL" else None)
   cursor.execute(query, values)
   connection.commit()
