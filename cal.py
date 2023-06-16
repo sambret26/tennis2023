@@ -7,7 +7,6 @@ from googleapiclient.discovery import build
 from logs import printDetails, printLogs
 import os.path as path
 import schedule
-import asyncio
 import pickle
 import logs
 import DB
@@ -20,7 +19,7 @@ def getEvent(eventId):
   return event
 
 
-def compare(eventInDB, eventInCal): #TODO
+def compare(eventInDB, eventInCal):
   event = generateEvent(eventInDB)
   if event['summary'] != eventInCal['summary'] or\
      event['description'] != eventInCal['description'] or\
@@ -77,27 +76,27 @@ def getColor(category):
 
 
 def getStart(day, hour):
- d, m = day.split("/")
- h, min = hour.lower().split("h")
- if min == '' : min = "00"
- if len(h) == 1 : h = "0" + h
- return "2023-{}-{}T{}:{}:00".format(m, d, h, min)
+  d, m = day.split("/")
+  h, min = hour.lower().split("h")
+  if min == '' : min = "00"
+  if len(h) == 1 : h = "0" + h
+  return "2023-{}-{}T{}:{}:00".format(m, d, h, min)
 
 
 def getEnd(day, hour):
- d, m = day.split("/")
- h, min = hour.lower().split("h")
- if min == '' : min = "00"
- h = int(h) + 1
- min = int(min) + 30
- if min > 59:
-   h = h + 1
-   min = min - 60
- h = str(h)
- min = str(min)
- if len(h) == 1 : h = "0" + h
- if len(min) == 1 : min = "0" + min
- return "2023-{}-{}T{}:{}:00".format(m, d, h, min)
+  d, m = day.split("/")
+  h, min = hour.lower().split("h")
+  if min == '' : min = "00"
+  h = int(h) + 1
+  min = int(min) + 30
+  if min > 59:
+    h = h + 1
+    min = min - 60
+  h = str(h)
+  min = str(min)
+  if len(h) == 1 : h = "0" + h
+  if len(min) == 1 : min = "0" + min
+  return "2023-{}-{}T{}:{}:00".format(m, d, h, min)
 
 
 def getPlayerFromPlayerIdInDB(cat, playerIdDB):
@@ -109,7 +108,7 @@ def getPlayerFromPlayerIdInDB(cat, playerIdDB):
     return "Le vainqueur du match {}".format(match)
   if playerIdDB.startswith("VT"):
     return "Qualifié entrant"
-  if cat.startswith("S") :
+  if cat.startswith("S"):
     p1 = DB.getPlayerInfosById(playerIdDB)
     return "{} {} ({})".format(p1[1], p1[0], p1[2])
   return DB.getTeamInfosById(playerIdDB)
@@ -147,7 +146,7 @@ le reste des opérations")
   eventsResult = service.events().list(calendarId=calendarId,\
     singleEvents=True, orderBy='startTime').execute()
   events = eventsResult.get('items', [])
-  for event in events :
+  for event in events:
     service.events().delete(calendarId=calendarId,\
       eventId=event['id']).execute()
   DB.removeCalId()
@@ -197,7 +196,7 @@ def updateSingleEvent(eventInDB):
 
 def updateOneEvent(id):
   eventInDB = DB.getMatchInfosById(id)
-  if(DB.getCalendarStatus() == 1) : return
+  if(DB.getCalendarStatus() == 1): return
   printDetails(logs.CAL, logs.INFO, "Updating event {}".format(id))
   DB.setCalendarStatus(1)
   updateSingleEvent(eventInDB)

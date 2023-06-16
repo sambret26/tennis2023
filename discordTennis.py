@@ -12,7 +12,6 @@ import asyncio
 import DB
 import discordTennisFunctions as DTF
 import schedule
-import time
 import cal
 
 intent = discord.Intents(messages=True, members=True, guilds=True)

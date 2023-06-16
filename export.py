@@ -223,14 +223,14 @@ def insertMatch():
   return response
 
 
-@app.route('modifMatch', methods=['Post'])
+@app.route('/modifMatch', methods=['Post'])
 def modifMatch():
   match = request.args.to_dict()
   connection = connect()
   cursor = connection.cursor()
-  query = "UPDATE Matchs SET Player1 = ?, Player2 = ?, Day = ?, Hour = ?, Court = ?, Finish = ?, Winner = ?, Score = ?, Notif = ? WHERE Name = ?"
+  query = "UPDATE Matchs SET Player1 = ?, Player2 = ?, Day = ?, Hour = ?, Court = ?, Finish = ?, Winner = ?, Score = ?, Notif = 0 WHERE Name = ?"
   values = []
-  for value in ["Player1", "Player2", "Day", "Hour", "Court", "Finish", "Winner", "Score", "Notif", "Name"]
+  for value in ["Player1", "Player2", "Day", "Hour", "Court", "Finish", "Winner", "Score", "Name"]
     values.append(match[value] if match[value] != "NULL" else None)
   cursor.execute(query, values)
   connection.commit()
@@ -238,6 +238,15 @@ def modifMatch():
   response = {"status": 201}
   return response
 
+
+@app.route('/getAllMatchsNames', methods=['Get'])
+def getAllMatchsNames():
+  connection = connect()
+  cursor = connection.cursor()
+  cursor.execute("SELECT Name FROM Matchs")
+  matchsNames = [row[0] for row in cursor.fetchall()]
+  connection.close()
+  return jsonify(matchsNames)
 
 
 def main():

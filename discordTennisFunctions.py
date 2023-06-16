@@ -53,7 +53,7 @@ async def info(ctx, name):
 async def result(bot, ctx, name):
   if name == None:
     await ctx.send(
-      "La commande $info doit être suivi du nom d'un match (ex : $info SM27)")
+      "La commande $result doit être suivi du nom d'un match (ex : $info SM27)")
     return
   name = name.upper()
   matchInfos = DB.getMatchInfosByName(name)
@@ -366,7 +366,7 @@ async def sendMessagesByCategory(bot, cat):
 
 
 def generateMatchMessage(matchInfos):
-  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, score, notif, calid = matchInfos
+  id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, notif, score, calid = matchInfos
   player1 = getPlayerFromPlayerIdInDB(cat, player1Id)
   player2 = getPlayerFromPlayerIdInDB(cat, player2Id)
   if finish:
