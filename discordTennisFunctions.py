@@ -222,6 +222,16 @@ async def pg(ctx, args):
     matchs = DB.getMatchsByDate(date)
     if matchs == None: break
     message += "Voici la programmation du {}:\n".format(date)
+
+    def sort_key(match):
+      time = match[3].lower()
+      if time.endswith('h'):  # Format Xh
+        time = time[:-1].zfill(2) + '00'  # Ajouter les minutes 00
+      else:  # Format XXh ou XXhXX
+        time = time.replace('h', '').zfill(4)  # Supprimer 'h' et ajouter les minutes
+      return int(time)
+
+    matchs = sorted(matchs, key=sort_key)
     for match in matchs:
       player1 = getPlayerFromPlayerIdInDB(match[0], match[1])
       player2 = getPlayerFromPlayerIdInDB(match[0], match[2])
@@ -232,6 +242,34 @@ async def pg(ctx, args):
   if not matchs:
     message = "Aucune programmation prévue le {}".format(dates[0])
   await ctx.send(message)
+
+
+async def pgWhatsapp(bot):
+  channelID = DB.getLogChannelID("WA")
+  channel = await bot.fetch_channel(channelID)
+  message = ""
+  matchs = False
+  date = getCurrentDate().strftime("%d/%m")
+  matchs = DB.getMatchsByDate(date)
+  if matchs == None or matchs == []:
+    await channel.send("Aucune programmation prévue le {}".format(date))
+    return
+  message += "Programmation du {}:\n".format(date)
+
+  def sort_key(match):
+    time = match[3].lower()
+    if time.endswith('h'):  # Format Xh
+      time = time[:-1].zfill(2) + '00'  # Ajouter les minutes 00
+    else:  # Format XXh ou XXhXX
+      time = time.replace('h', '').zfill(4)  # Supprimer 'h' et ajouter les minutes
+    return int(time)
+
+  matchs = sorted(matchs, key=sort_key)
+  for match in matchs:
+    player1 = getPlayerFromPlayerIdInDB(match[0], match[1])
+    player2 = getPlayerFromPlayerIdInDB(match[0], match[2])
+    message += "{} : {} contre {}\n".format(match[3], player1, player2)
+  await channel.send(message)
 
 
 async def cmd(ctx):

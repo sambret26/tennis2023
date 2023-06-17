@@ -152,6 +152,11 @@ async def program(ctx, *args):
 
 
 @bot.command()
+async def pgw(ctx):
+  await DTF.pgWhatsapp(bot)
+
+
+@bot.command()
 async def updateCal(ctx):
   await cal.update(ctx)
 
@@ -208,5 +213,7 @@ def main():
     lambda: asyncio.create_task(DTF.sendMessages(bot)))
   schedule.every().minute.at(":30").do(
     lambda: asyncio.create_task(DTF.maj(bot)))
+  schedule.every().day.at("08:58").do(
+    lambda: asyncio.create_task(DTF.pgWhatsapp(bot)))
   bot.loop.create_task(recurring_task())
   bot.run(DB.getDiscordToken())
