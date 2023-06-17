@@ -177,6 +177,11 @@ async def dc(ctx):
 
 
 @bot.command()
+async def revert(ctx):
+  await DTF.revert(ctx)
+
+
+@bot.command()
 async def cmd(ctx):
   if ctx.message.guild.id != DB.getGuildID(): return
   await DTF.cmd(ctx)

@@ -3,7 +3,8 @@
 # IMPORTS
 from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
 from discord_slash import ButtonStyle
-from logs import printLogs, getCurrentDate
+from logs import printLogs, printDetails, getCurrentDate
+import subprocess
 import discord
 import tennis
 import logs
@@ -60,6 +61,7 @@ async def result(bot, ctx, name):
   if matchInfos == None:
     await ctx.send(f"Le match {name} n'a pas été trouvé en base de données")
     return
+  backup()
   id, cat, name, player1Id, player2Id, day, hour, court, finish, winnerId, notif, score, calid = matchInfos
   if winnerId != None and score != None:
     res = await yesOrNot(
@@ -86,6 +88,7 @@ async def modifCourt(bot, ctx, name):
   if matchId == None:
     await ctx.send("Match non trouvé {}".format(matchName))
     return
+  backup()
   message = "Sur quel court voulez vous déplacer ce match ?"
   list = [("Numéro 1", "1", "green"), ("Numéro 2", "2", "blue"),
           ("Numéro 3", "3", "red")]
@@ -112,6 +115,7 @@ async def modifJoueur1(ctx, args):
     await ctx.send("Joueur non trouvé : {} {}".format(
       playerLastname, playerFirstname))
     return
+  backup()
   DB.setPlayer1(matchId, playerId)
   message = "Le match {} à maintenant comme joueur 1 {} {}".format(
     matchName, playerLastname, playerFirstname)
@@ -135,6 +139,7 @@ async def modifJoueur2(ctx, args):
     await ctx.send("Joueur non trouvé : {} {}".format(
       playerLastname, playerFirstname))
     return
+  backup()
   DB.setPlayer2(matchId, playerId)
   message = "Le match {} à maintenant comme joueur 2 {} {}".format(
     matchName, playerLastname, playerFirstname)
@@ -160,6 +165,7 @@ async def modifJour(ctx, args):
   if notInTournament(day):
     await ctx.send("Le jour indiqué {} est hors du tournoi".format(day))
     return
+  backup()
   DB.setDay(matchId, day)
   message = "Le match {} est programmé pour le {}".format(matchName, day)
   cal.updateOneEvent(matchId)
@@ -179,6 +185,7 @@ async def modifHeure(ctx, args):
   if hour == None:
     await ctx.send("L'heure entrée n'est pas correcte")
     return
+  backup()
   DB.setHour(matchId, hour)
   message = "Le match {} est programmé à {}".format(matchName, hour)
   cal.updateOneEvent(matchId)
@@ -206,6 +213,7 @@ async def modifPg(ctx, args):
   if hour == None:
     await ctx.send("L'heure entrée n'est pas correcte")
     return
+  backup()
   DB.setDay(matchId, day)
   DB.setHour(matchId, hour)
   message = "Le match {} est programmé pour le {} à {}".format(
@@ -569,3 +577,15 @@ async def addNotifMatch():
       player2 = getPlayerFromPlayerIdInDB(match[1], match[3])
       DB.setNotifToSend(match[0])
       DB.addNotif(match, player1, player2)
+
+
+def backup():
+  printDetails(logs.DB, logs.INFO, "Doing a backup")
+  cmd = "cp DB.db DB_backup.db"
+  subprocess.run(cmd, shell=True, capture_output=True, text=True)
+
+
+async def revert(ctx):
+  cmd = "mv DB_backup.db DB.db.tmp && mv DB.db DB_backup && mv DB.db.tmp DB.db"
+  subprocess.run(cmd, shell=True, capture_output=True, text=True)
+  await ctx.send("Vous êtes revenus à une version précedente")
