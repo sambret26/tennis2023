@@ -189,6 +189,15 @@ def getMatchsInfo():
   query = "SELECT Name, Player1, Player2, Day, Hour, Court, Finish, Winner, Score FROM Matchs"
   matchs = cursor.execute(query).fetchall()
   connection.close()
+
+  def sort_key(match):
+    category = match[0][:2]  # Récupérer les deux premiers caractères (la catégorie)
+    number = int(match[0][2:])  # Récupérer le nombre (les chiffres)
+    category_order = {'SM': 1, 'SD': 2, 'DM': 3, 'DD': 4, 'DX': 5}  # Définir l'ordre des catégories
+    return category_order[category], number
+
+  matchs = sorted(matchs, key=sort_key)
+
   return jsonify(matchs)
 
 
