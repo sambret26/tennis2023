@@ -586,6 +586,6 @@ def backup():
 
 
 async def revert(ctx):
-  cmd = "mv DB_backup.db DB.db.tmp && mv DB.db DB_backup && mv DB.db.tmp DB.db"
+  cmd = "mv DB_backup.db DB.db.tmp && mv DB.db DB_backup.db && mv DB.db.tmp DB.db"
   subprocess.run(cmd, shell=True, capture_output=True, text=True)
   await ctx.send("Vous êtes revenus à une version précedente")

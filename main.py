@@ -8,7 +8,6 @@ sys.path.append("modules")
 import discordTennis
 import export
 import threading
-import cal
 import os
 
 # KEEPING ALIVE (en cas de deploiement sur replit)
