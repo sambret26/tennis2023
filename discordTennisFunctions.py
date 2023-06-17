@@ -293,7 +293,8 @@ async def cmd(ctx):
   message += "$modifHeure [match] [heure]: modifier l'heure affectée à un match ($mh)\n"
   message += "$modifiPg [match] [jour] [heure] : modifier la programmation d'un match ($mpg)\n"
   message += "$pg {jour} : obtenir la programmation des jours données, ou du jour actuel ($program / $programmation)\n"
-  message == "$updateCal : mettre à jour tout les évènements (attention, chargement assez long)\n"
+  message += "$updateCal : mettre à jour tout les évènements (attention, chargement assez long)\n"
+  message += "$revert : permet d'annuler la dernière action effectuée"
   await ctx.send(message)
 
 
