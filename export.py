@@ -269,7 +269,7 @@ def getRanking(id):
   return jsonify(ranking)
 
 
-@app.route('insertTeam', methods=['Post'])
+@app.route('/insertTeam', methods=['Post'])
 def insertTeam():
   values = request.args.to_dict()
   connection = connect()
