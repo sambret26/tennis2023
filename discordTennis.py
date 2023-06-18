@@ -218,7 +218,7 @@ def main():
     lambda: asyncio.create_task(DTF.sendMessages(bot)))
   schedule.every().minute.at(":30").do(
     lambda: asyncio.create_task(DTF.maj(bot)))
-  schedule.every().day.at("08:58").do(
+  schedule.every().day.at("06:58").do(
     lambda: asyncio.create_task(DTF.pgWhatsapp(bot)))
   bot.loop.create_task(recurring_task())
   bot.run(DB.getDiscordToken())
