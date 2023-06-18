@@ -270,6 +270,7 @@ def getRanking(id):
 
 
 @app.route('insertTeam', methods=['Post'])
+def insertTeam():
   values = request.args.to_dict()
   connection = connect()
   cursor = connection.cursor()
