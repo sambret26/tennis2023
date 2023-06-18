@@ -258,5 +258,29 @@ def getAllMatchsNames():
   return jsonify(matchsNames)
 
 
+@app.route('/getRanking/<id>', methods=['Get'])
+def getRanking(id):
+  connection = connect()
+  cursor = connection.cursor()
+  query = "SELECT Ranking FROM Players WHERE id = ?"
+  values = (id, )
+  ranking = cursor.execute(query, values).fetchone()[0]
+  connection.close()
+  return jsonify(ranking)
+
+
+@app.route('insertTeam', methods=['Post'])
+  values = request.args.to_dict()
+  connection = connect()
+  cursor = connection.cursor()
+  query = "INSERT INTO Teams (Player1, Player2, Ranking, DM, DD, DX,) VALUES (?, ?, ?, ?, ?, ?)"
+  values = (values["Player1"], values["Player2"], values["Ranking"], values["DM"], values["DD"], values["DX"])
+  cursor.execute(query, values)
+  connection.commit()
+  connection.close()
+  response = {"status": 201}
+  return response
+
+
 def main():
   app.run(host="0.0.0.0", port=8070)
